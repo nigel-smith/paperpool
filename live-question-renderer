@@ -1,0 +1,590 @@
+import { useState, useRef, useEffect } from "react";
+
+// ─── QUESTION TEMPLATES ───────────────────────────────────────────────────────
+
+const QUESTION_FAMILIES = [
+  {
+    id: "pythagoras",
+    topic: "Geometry",
+    subtopic: "Pythagoras' Theorem",
+    grade: "5",
+    diagramType: "right_triangle",
+    template: (v) => `A right-angled triangle has legs of length ${v.a} cm and ${v.b} cm. Find the length of the hypotenuse. Give your answer in centimetres.`,
+    answer: (v) => {
+      const c = Math.sqrt(v.a ** 2 + v.b ** 2);
+      return Number.isInteger(c) ? `${c} cm` : `${c.toFixed(2)} cm`;
+    },
+    markScheme: (v) => {
+      const c = Math.sqrt(v.a ** 2 + v.b ** 2);
+      const ans = Number.isInteger(c) ? c : c.toFixed(2);
+      return [
+        { code: "M1", desc: `Correct use of Pythagoras: ${v.a}² + ${v.b}² = c²` },
+        { code: "A1", desc: `${v.a * v.a} + ${v.b * v.b} = ${v.a * v.a + v.b * v.b}` },
+        { code: "A1", desc: `${ans} cm` },
+      ];
+    },
+    variables: { a: 5, b: 12 },
+    variableDefs: [
+      { key: "a", label: "Leg A (cm)", min: 3, max: 20, step: 1 },
+      { key: "b", label: "Leg B (cm)", min: 3, max: 20, step: 1 },
+    ],
+    variants: [{ a: 5, b: 12 }, { a: 3, b: 4 }, { a: 8, b: 15 }, { a: 7, b: 24 }, { a: 9, b: 40 }],
+    marks: 3,
+  },
+  {
+    id: "angles_triangle",
+    topic: "Geometry",
+    subtopic: "Angles in a Triangle",
+    grade: "4",
+    diagramType: "triangle_angles",
+    template: (v) => `Find the missing angle x in the triangle below. The triangle has angles of ${v.a}°, ${v.b}° and x°.`,
+    answer: (v) => `${180 - v.a - v.b}°`,
+    markScheme: (v) => [
+      { code: "M1", desc: `Angles in a triangle sum to 180°` },
+      { code: "A1", desc: `x = 180 − ${v.a} − ${v.b} = ${180 - v.a - v.b}°` },
+    ],
+    variables: { a: 65, b: 48 },
+    variableDefs: [
+      { key: "a", label: "Angle A (°)", min: 20, max: 120, step: 1 },
+      { key: "b", label: "Angle B (°)", min: 20, max: 120, step: 1 },
+    ],
+    variants: [{ a: 65, b: 48 }, { a: 72, b: 35 }, { a: 110, b: 30 }, { a: 45, b: 45 }, { a: 80, b: 60 }],
+    marks: 2,
+  },
+  {
+    id: "frequency_table",
+    topic: "Statistics",
+    subtopic: "Mean from Frequency Table",
+    grade: "5",
+    diagramType: "frequency_table",
+    template: (v) => `The frequency table shows the number of books read by students last month. Calculate the mean number of books read. Give your answer to 1 decimal place.`,
+    answer: (v) => {
+      const total = v.rows.reduce((s, r) => s + r.x * r.f, 0);
+      const n = v.rows.reduce((s, r) => s + r.f, 0);
+      return `${(total / n).toFixed(1)} books`;
+    },
+    markScheme: (v) => {
+      const total = v.rows.reduce((s, r) => s + r.x * r.f, 0);
+      const n = v.rows.reduce((s, r) => s + r.f, 0);
+      return [
+        { code: "M1", desc: `Calculate fx for each row: ${v.rows.map(r => `${r.x}×${r.f}=${r.x * r.f}`).join(", ")}` },
+        { code: "A1", desc: `Σfx = ${total}, Σf = ${n}` },
+        { code: "A1", desc: `Mean = ${total} ÷ ${n} = ${(total / n).toFixed(1)}` },
+      ];
+    },
+    variables: {
+      rows: [
+        { x: 0, f: 3 }, { x: 1, f: 7 }, { x: 2, f: 12 }, { x: 3, f: 8 }, { x: 4, f: 5 },
+      ],
+    },
+    variableDefs: [],
+    variants: [
+      { rows: [{ x: 0, f: 3 }, { x: 1, f: 7 }, { x: 2, f: 12 }, { x: 3, f: 8 }, { x: 4, f: 5 }] },
+      { rows: [{ x: 1, f: 5 }, { x: 2, f: 9 }, { x: 3, f: 11 }, { x: 4, f: 6 }, { x: 5, f: 4 }] },
+      { rows: [{ x: 0, f: 8 }, { x: 1, f: 14 }, { x: 2, f: 9 }, { x: 3, f: 4 }, { x: 4, f: 1 }] },
+    ],
+    marks: 3,
+  },
+  {
+    id: "scatter",
+    topic: "Statistics",
+    subtopic: "Scatter Graphs & Correlation",
+    grade: "4",
+    diagramType: "scatter_graph",
+    template: (v) => `The scatter graph shows the ${v.xLabel} and ${v.yLabel} of ${v.n} students. Describe the correlation shown and draw a line of best fit.`,
+    answer: (v) => v.correlation,
+    markScheme: (v) => [
+      { code: "B1", desc: `Correct description: ${v.correlation}` },
+      { code: "B1", desc: `Line of best fit drawn through the mean point with roughly equal points either side` },
+    ],
+    variables: {
+      xLabel: "hours revised", yLabel: "test score (%)", n: 10,
+      correlation: "Positive correlation — as hours revised increases, test score increases",
+      points: [[1, 23], [2, 35], [2, 41], [3, 48], [4, 55], [5, 62], [5, 70], [6, 74], [7, 81], [8, 88]],
+    },
+    variableDefs: [],
+    variants: [
+      {
+        xLabel: "hours revised", yLabel: "test score (%)", n: 10,
+        correlation: "Positive correlation",
+        points: [[1, 23], [2, 35], [2, 41], [3, 48], [4, 55], [5, 62], [5, 70], [6, 74], [7, 81], [8, 88]],
+      },
+      {
+        xLabel: "distance from school (km)", yLabel: "time to arrive (min)", n: 8,
+        correlation: "Positive correlation",
+        points: [[1, 8], [2, 14], [3, 18], [3, 22], [5, 30], [6, 38], [7, 42], [8, 50]],
+      },
+      {
+        xLabel: "temperature (°C)", yLabel: "hot drinks sold", n: 9,
+        correlation: "Negative correlation",
+        points: [[5, 95], [8, 80], [10, 72], [14, 60], [18, 48], [22, 35], [25, 28], [28, 18], [30, 12]],
+      },
+    ],
+    marks: 2,
+  },
+  {
+    id: "coordinate_line",
+    topic: "Algebra",
+    subtopic: "Straight Line Graphs",
+    grade: "5",
+    diagramType: "coordinate_grid",
+    template: (v) => `A straight line passes through the points (${v.x1}, ${v.y1}) and (${v.x2}, ${v.y2}). Find the equation of the line in the form y = mx + c.`,
+    answer: (v) => {
+      const m = (v.y2 - v.y1) / (v.x2 - v.x1);
+      const c = v.y1 - m * v.x1;
+      const mStr = Number.isInteger(m) ? m : m.toFixed(1);
+      const cStr = c === 0 ? "" : c > 0 ? ` + ${Number.isInteger(c) ? c : c.toFixed(1)}` : ` − ${Math.abs(Number.isInteger(c) ? c : c.toFixed(1))}`;
+      return `y = ${mStr}x${cStr}`;
+    },
+    markScheme: (v) => {
+      const m = (v.y2 - v.y1) / (v.x2 - v.x1);
+      const c = v.y1 - m * v.x1;
+      return [
+        { code: "M1", desc: `Gradient = (${v.y2} − ${v.y1}) ÷ (${v.x2} − ${v.x1}) = ${m}` },
+        { code: "A1", desc: `m = ${m}` },
+        { code: "A1", desc: `c = ${c} (substitute a point into y = ${m}x + c)` },
+      ];
+    },
+    variables: { x1: 1, y1: 3, x2: 3, y2: 7 },
+    variableDefs: [
+      { key: "x1", label: "Point 1 x", min: -5, max: 0, step: 1 },
+      { key: "y1", label: "Point 1 y", min: -5, max: 5, step: 1 },
+      { key: "x2", label: "Point 2 x", min: 1, max: 6, step: 1 },
+      { key: "y2", label: "Point 2 y", min: 1, max: 10, step: 1 },
+    ],
+    variants: [
+      { x1: 1, y1: 3, x2: 3, y2: 7 },
+      { x1: 0, y1: 1, x2: 4, y2: 9 },
+      { x1: -2, y1: 5, x2: 2, y2: 1 },
+      { x1: 0, y1: -3, x2: 3, y2: 6 },
+    ],
+    marks: 3,
+  },
+];
+
+// ─── DIAGRAM RENDERERS ────────────────────────────────────────────────────────
+
+function RightTriangleDiagram({ vars }) {
+  const { a, b } = vars;
+  const c = Math.sqrt(a * a + b * b);
+  const cLabel = Number.isInteger(c) ? `${c} cm` : "? cm";
+  const W = 260, H = 180;
+  const pad = 30;
+  const scale = Math.min((W - pad * 2) / b, (H - pad * 2) / a);
+  const bx = pad, by = pad + a * scale;
+  const cx = pad + b * scale, cy = pad + a * scale;
+  const ax = pad, ay = pad;
+  const sqSize = 12;
+
+  return (
+    <svg width={W} height={H} className="w-full" viewBox={`0 0 ${W} ${H}`}>
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#6366f1" />
+        </marker>
+      </defs>
+      {/* Triangle */}
+      <polygon points={`${ax},${ay} ${bx},${by} ${cx},${cy}`}
+        fill="#6366f130" stroke="#6366f1" strokeWidth="2" strokeLinejoin="round" />
+      {/* Right angle square */}
+      <rect x={bx} y={by - sqSize} width={sqSize} height={sqSize}
+        fill="none" stroke="#6366f180" strokeWidth="1.5" />
+      {/* Labels */}
+      <text x={ax - 20} y={(ay + by) / 2 + 5} fill="#a5b4fc" fontSize="13" fontFamily="Georgia" fontWeight="bold">{a} cm</text>
+      <text x={(bx + cx) / 2 - 12} y={by + 20} fill="#a5b4fc" fontSize="13" fontFamily="Georgia" fontWeight="bold">{b} cm</text>
+      <text x={(ax + cx) / 2 + 8} y={(ay + cy) / 2 - 6} fill="#67e8f9" fontSize="13" fontFamily="Georgia" fontWeight="bold"
+        transform={`rotate(${-Math.atan2(ay - cy, cx - ax) * 180 / Math.PI}, ${(ax + cx) / 2}, ${(ay + cy) / 2})`}>
+        {cLabel}
+      </text>
+      {/* Question mark dot */}
+      <circle cx={(ax + cx) / 2} cy={(ay + cy) / 2} r="4" fill="#67e8f9" opacity="0.6" />
+    </svg>
+  );
+}
+
+function TriangleAnglesDiagram({ vars }) {
+  const { a, b } = vars;
+  const x = 180 - a - b;
+  const W = 260, H = 180;
+  const pts = [[130, 25], [30, 155], [230, 155]];
+  const [A, B, C] = pts;
+
+  const arcLabel = (corner, angle, label, color, offset = 28) => {
+    const [px, py] = pts[corner];
+    const neighbors = pts.filter((_, i) => i !== corner);
+    const angles = neighbors.map(([nx, ny]) => Math.atan2(ny - py, nx - px));
+    const mid = (angles[0] + angles[1]) / 2;
+    return (
+      <text key={label} x={px + Math.cos(mid) * offset} y={py + Math.sin(mid) * offset + 4}
+        fill={color} fontSize="12" fontFamily="Georgia" fontWeight="bold" textAnchor="middle">
+        {label}
+      </text>
+    );
+  };
+
+  return (
+    <svg width={W} height={H} className="w-full" viewBox={`0 0 ${W} ${H}`}>
+      <polygon points={pts.map(p => p.join(",")).join(" ")}
+        fill="#6366f120" stroke="#6366f1" strokeWidth="2" strokeLinejoin="round" />
+      {arcLabel(0, a, `${a}°`, "#a5b4fc", 26)}
+      {arcLabel(1, b, `${b}°`, "#a5b4fc", 30)}
+      {arcLabel(2, x, x > 0 ? "x°" : "?", "#67e8f9", 30)}
+      {x > 0 && (
+        <text x={pts[2][0] + 32} y={pts[2][1] + 4} fill="#67e8f980" fontSize="10" fontFamily="Georgia">(= {x}°)</text>
+      )}
+    </svg>
+  );
+}
+
+function FrequencyTable({ vars, editable, onChange }) {
+  const { rows } = vars;
+  const total = rows.reduce((s, r) => s + r.f, 0);
+  const totalFX = rows.reduce((s, r) => s + r.x * r.f, 0);
+
+  return (
+    <div className="w-full overflow-x-auto">
+      <table className="w-full text-sm border-collapse">
+        <thead>
+          <tr>
+            {["Number of books (x)", "Frequency (f)", "fx"].map(h => (
+              <th key={h} className="px-3 py-2 text-center font-bold text-indigo-300 border border-white/20 bg-white/10 text-xs">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i} className="even:bg-white/5">
+              <td className="px-3 py-2 text-center text-white border border-white/15">
+                {editable ? (
+                  <input type="number" value={row.x} onChange={e => {
+                    const newRows = rows.map((r, j) => j === i ? { ...r, x: parseInt(e.target.value) || 0 } : r);
+                    onChange({ rows: newRows });
+                  }} className="w-14 bg-white/10 border border-white/20 rounded px-2 py-0.5 text-white text-center text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                ) : row.x}
+              </td>
+              <td className="px-3 py-2 text-center text-white border border-white/15">
+                {editable ? (
+                  <input type="number" value={row.f} onChange={e => {
+                    const newRows = rows.map((r, j) => j === i ? { ...r, f: parseInt(e.target.value) || 0 } : r);
+                    onChange({ rows: newRows });
+                  }} className="w-14 bg-white/10 border border-white/20 rounded px-2 py-0.5 text-white text-center text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                ) : row.f}
+              </td>
+              <td className="px-3 py-2 text-center text-cyan-300 border border-white/15 font-mono">{row.x * row.f}</td>
+            </tr>
+          ))}
+          <tr className="bg-white/10">
+            <td className="px-3 py-2 text-center font-bold text-white border border-white/20">Total</td>
+            <td className="px-3 py-2 text-center font-bold text-amber-300 border border-white/20">{total}</td>
+            <td className="px-3 py-2 text-center font-bold text-amber-300 border border-white/20">{totalFX}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p className="text-xs text-slate-500 mt-2 text-center">fx column auto-calculates · Mean = {totalFX}/{total} = {(totalFX / total).toFixed(1)}</p>
+    </div>
+  );
+}
+
+function ScatterGraph({ vars }) {
+  const { points, xLabel, yLabel } = vars;
+  const W = 260, H = 200, pad = { l: 40, r: 20, t: 20, b: 40 };
+  const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+  const xMin = 0, xMax = Math.max(...xs) + 1;
+  const yMin = 0, yMax = Math.max(...ys) + 10;
+  const gW = W - pad.l - pad.r, gH = H - pad.t - pad.b;
+  const px = x => pad.l + ((x - xMin) / (xMax - xMin)) * gW;
+  const py = y => pad.t + gH - ((y - yMin) / (yMax - yMin)) * gH;
+  const xTicks = Array.from({ length: Math.min(xMax, 9) }, (_, i) => i + 1);
+  const yTicks = [0, 20, 40, 60, 80, 100].filter(v => v <= yMax);
+
+  // Line of best fit
+  const n = points.length;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  const m = xs.reduce((s, x, i) => s + (x - mx) * (ys[i] - my), 0) / xs.reduce((s, x) => s + (x - mx) ** 2, 0);
+  const c = my - m * mx;
+  const lx1 = xMin, ly1 = m * lx1 + c;
+  const lx2 = xMax, ly2 = m * lx2 + c;
+
+  return (
+    <svg width={W} height={H} className="w-full" viewBox={`0 0 ${W} ${H}`}>
+      {/* Grid */}
+      {yTicks.map(y => (
+        <line key={y} x1={pad.l} y1={py(y)} x2={W - pad.r} y2={py(y)} stroke="#ffffff15" strokeWidth="1" />
+      ))}
+      {xTicks.map(x => (
+        <line key={x} x1={px(x)} y1={pad.t} x2={px(x)} y2={H - pad.b} stroke="#ffffff15" strokeWidth="1" />
+      ))}
+      {/* Axes */}
+      <line x1={pad.l} y1={pad.t} x2={pad.l} y2={H - pad.b} stroke="#6366f180" strokeWidth="1.5" />
+      <line x1={pad.l} y1={H - pad.b} x2={W - pad.r} y2={H - pad.b} stroke="#6366f180" strokeWidth="1.5" />
+      {/* Tick labels */}
+      {xTicks.map(x => <text key={x} x={px(x)} y={H - pad.b + 14} fill="#64748b" fontSize="9" textAnchor="middle">{x}</text>)}
+      {yTicks.map(y => <text key={y} x={pad.l - 6} y={py(y) + 4} fill="#64748b" fontSize="9" textAnchor="end">{y}</text>)}
+      {/* Axis labels */}
+      <text x={pad.l + gW / 2} y={H - 2} fill="#94a3b8" fontSize="9" textAnchor="middle">{xLabel}</text>
+      <text x={10} y={pad.t + gH / 2} fill="#94a3b8" fontSize="9" textAnchor="middle" transform={`rotate(-90, 10, ${pad.t + gH / 2})`}>{yLabel}</text>
+      {/* Line of best fit (dashed, shown lightly) */}
+      <line x1={px(lx1)} y1={py(ly1)} x2={px(lx2)} y2={py(ly2)}
+        stroke="#6366f160" strokeWidth="1.5" strokeDasharray="4,3" />
+      {/* Points */}
+      {points.map(([x, y], i) => (
+        <circle key={i} cx={px(x)} cy={py(y)} r="4" fill="#6366f1" stroke="#818cf8" strokeWidth="1.5" />
+      ))}
+    </svg>
+  );
+}
+
+function CoordinateGrid({ vars }) {
+  const { x1, y1, x2, y2 } = vars;
+  const m = (y2 - y1) / (x2 - x1);
+  const c = y1 - m * x1;
+  const W = 260, H = 220;
+  const allX = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6];
+  const allY = [-4, -2, 0, 2, 4, 6, 8, 10];
+  const ox = 80, oy = 160, scale = 22;
+  const gx = x => ox + x * scale;
+  const gy = y => oy - y * scale;
+  const lineXStart = -6, lineXEnd = 6;
+  const lineYStart = m * lineXStart + c, lineYEnd = m * lineXEnd + c;
+
+  return (
+    <svg width={W} height={H} className="w-full" viewBox={`0 0 ${W} ${H}`}>
+      {/* Grid lines */}
+      {allX.map(x => <line key={`vg${x}`} x1={gx(x)} y1={10} x2={gx(x)} y2={H - 10} stroke="#ffffff0d" strokeWidth="1" />)}
+      {allY.map(y => <line key={`hg${y}`} x1={10} y1={gy(y)} x2={W - 10} y2={gy(y)} stroke="#ffffff0d" strokeWidth="1" />)}
+      {/* Axes */}
+      <line x1={10} y1={oy} x2={W - 10} y2={oy} stroke="#6366f150" strokeWidth="1.5" />
+      <line x1={ox} y1={10} x2={ox} y2={H - 10} stroke="#6366f150" strokeWidth="1.5" />
+      {/* Tick labels */}
+      {[-4, -2, 2, 4, 6].map(x => <text key={x} x={gx(x)} y={oy + 14} fill="#475569" fontSize="9" textAnchor="middle">{x}</text>)}
+      {[-2, 2, 4, 6, 8].map(y => <text key={y} x={ox - 8} y={gy(y) + 3} fill="#475569" fontSize="9" textAnchor="end">{y}</text>)}
+      {/* The line */}
+      <line x1={gx(lineXStart)} y1={gy(lineYStart)} x2={gx(lineXEnd)} y2={gy(lineYEnd)}
+        stroke="#6366f1" strokeWidth="2" />
+      {/* The two points */}
+      {[[x1, y1], [x2, y2]].map(([px, py], i) => (
+        <g key={i}>
+          <circle cx={gx(px)} cy={gy(py)} r="5" fill="#6366f1" stroke="#a5b4fc" strokeWidth="2" />
+          <text x={gx(px) + 8} y={gy(py) - 6} fill="#a5b4fc" fontSize="10" fontFamily="Georgia">({px},{py})</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function DiagramRenderer({ type, vars, editable, onChange }) {
+  if (type === "right_triangle") return <RightTriangleDiagram vars={vars} />;
+  if (type === "triangle_angles") return <TriangleAnglesDiagram vars={vars} />;
+  if (type === "frequency_table") return <FrequencyTable vars={vars} editable={editable} onChange={onChange} />;
+  if (type === "scatter_graph") return <ScatterGraph vars={vars} />;
+  if (type === "coordinate_grid") return <CoordinateGrid vars={vars} />;
+  return null;
+}
+
+// ─── MARK SCHEME ─────────────────────────────────────────────────────────────
+
+function MarkScheme({ items }) {
+  const colors = { M: "bg-indigo-500/30 text-indigo-300", A: "bg-cyan-500/30 text-cyan-300", B: "bg-amber-500/30 text-amber-300" };
+  return (
+    <div className="flex flex-col gap-2">
+      {items.map((m, i) => (
+        <div key={i} className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-xl p-3">
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5 ${colors[m.code[0]] || colors.B}`}>{m.code}</span>
+          <span className="text-slate-300 text-sm">{m.desc}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── QUESTION CARD ────────────────────────────────────────────────────────────
+
+function QuestionCard({ family }) {
+  const [vars, setVars] = useState(family.variables);
+  const [variantIdx, setVariantIdx] = useState(0);
+  const [showScheme, setShowScheme] = useState(false);
+  const [editTable, setEditTable] = useState(false);
+
+  const useVariant = (idx) => {
+    setVariantIdx(idx);
+    setVars(family.variants[idx]);
+    setShowScheme(false);
+  };
+
+  const updateVar = (key, val) => setVars(v => ({ ...v, [key]: Number(val) }));
+
+  const topicColors = {
+    Geometry: "#0891b2", Statistics: "#059669", Algebra: "#7c3aed"
+  };
+  const color = topicColors[family.topic] || "#6366f1";
+
+  return (
+    <div className="rounded-2xl border overflow-hidden" style={{ borderColor: color + "40" }}>
+      {/* Header */}
+      <div className="px-4 py-3 flex items-center justify-between" style={{ background: color + "18" }}>
+        <div>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color }}>{family.topic}</span>
+          <span className="text-slate-500 text-xs mx-2">·</span>
+          <span className="text-slate-400 text-xs">{family.subtopic}</span>
+        </div>
+        <div className="flex gap-2 items-center">
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full border" style={{ background: color + "22", color, borderColor: color + "44" }}>
+            Grade {family.grade}
+          </span>
+          <span className="text-xs text-slate-500">{family.marks}m</span>
+        </div>
+      </div>
+
+      <div className="p-4 flex flex-col gap-4">
+        {/* Diagram */}
+        <div className="bg-black/30 rounded-xl p-3 flex items-center justify-center min-h-[160px]">
+          <DiagramRenderer type={family.diagramType} vars={vars}
+            editable={editTable} onChange={v => setVars(prev => ({ ...prev, ...v }))} />
+        </div>
+
+        {/* Diagram type badge */}
+        <div className="flex items-center gap-2 -mt-2">
+          <span className="text-xs text-slate-600">Renderer:</span>
+          <span className="text-xs font-mono text-slate-500 bg-white/5 px-2 py-0.5 rounded">{family.diagramType}</span>
+          <span className="text-xs text-slate-600 ml-auto">↑ redraws from data</span>
+        </div>
+
+        {/* Question text */}
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+          <p className="text-white text-sm leading-relaxed font-medium">{family.template(vars)}</p>
+        </div>
+
+        {/* Variable sliders (for geometric questions) */}
+        {family.variableDefs.length > 0 && (
+          <div className="flex flex-col gap-3 bg-white/3 border border-white/8 rounded-xl p-3">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Adjust values → diagram updates live</p>
+            {family.variableDefs.map(def => (
+              <div key={def.key} className="flex items-center gap-3">
+                <label className="text-xs text-slate-400 w-28 flex-shrink-0">{def.label}</label>
+                <input type="range" min={def.min} max={def.max} step={def.step}
+                  value={vars[def.key]}
+                  onChange={e => updateVar(def.key, e.target.value)}
+                  className="flex-1 accent-indigo-500 h-1.5" />
+                <span className="text-white font-mono text-sm w-8 text-right">{vars[def.key]}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Table edit toggle */}
+        {family.diagramType === "frequency_table" && (
+          <button onClick={() => setEditTable(!editTable)}
+            className="text-xs text-indigo-400 underline text-left">
+            {editTable ? "Lock table values" : "✎ Edit table values live"}
+          </button>
+        )}
+
+        {/* Variant switcher */}
+        <div>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Question variants (same structure, different values)</p>
+          <div className="flex gap-2 flex-wrap">
+            {family.variants.map((v, i) => (
+              <button key={i} onClick={() => useVariant(i)}
+                className="text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all"
+                style={{
+                  background: variantIdx === i ? color + "30" : "transparent",
+                  borderColor: variantIdx === i ? color : "#ffffff20",
+                  color: variantIdx === i ? color : "#64748b",
+                }}>
+                Variant {i + 1}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Answer */}
+        <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+          <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">Answer</span>
+          <span className="font-mono text-sm font-bold" style={{ color }}>{family.answer(vars)}</span>
+        </div>
+
+        {/* Mark scheme toggle */}
+        <button onClick={() => setShowScheme(!showScheme)}
+          className="text-xs font-bold uppercase tracking-widest text-left transition-colors"
+          style={{ color: showScheme ? color : "#475569" }}>
+          {showScheme ? "▼ Hide mark scheme" : "▶ Show mark scheme"}
+        </button>
+        {showScheme && <MarkScheme items={family.markScheme(vars)} />}
+      </div>
+    </div>
+  );
+}
+
+// ─── ROOT ─────────────────────────────────────────────────────────────────────
+
+export default function App() {
+  const [selected, setSelected] = useState("pythagoras");
+  const family = QUESTION_FAMILIES.find(f => f.id === selected);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center"
+      style={{ background: "linear-gradient(135deg, #0f0f1a 0%, #111827 60%, #0f172a 100%)", fontFamily: "'Georgia', serif" }}>
+
+      {/* Header */}
+      <div className="w-full max-w-md px-4 pt-6 pb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+            <span className="text-white text-xs font-bold">P</span>
+          </div>
+          <span className="text-white font-bold tracking-tight">paper<span className="text-indigo-400">pool</span></span>
+        </div>
+        <span className="text-xs font-semibold px-2 py-0.5 rounded-full border bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
+          Dynamic Diagrams
+        </span>
+      </div>
+
+      <div className="w-full max-w-md px-4 pb-16 flex flex-col gap-5">
+        <div>
+          <h2 className="text-white text-xl font-bold mb-1">Live Question Renderer</h2>
+          <p className="text-slate-400 text-sm leading-relaxed">
+            Every diagram and table renders from pure data — no images. Change values and watch everything update: diagram, question text, answer, and mark scheme all stay in sync.
+          </p>
+        </div>
+
+        {/* Question picker */}
+        <div className="grid grid-cols-1 gap-2">
+          {QUESTION_FAMILIES.map(f => (
+            <button key={f.id} onClick={() => setSelected(f.id)}
+              className={`flex items-center justify-between px-4 py-3 rounded-xl border text-left transition-all ${selected === f.id ? "border-indigo-500/60 bg-indigo-500/15" : "border-white/10 bg-white/5 hover:bg-white/8"}`}>
+              <div>
+                <span className="text-white text-sm font-semibold">{f.subtopic}</span>
+                <span className="text-slate-500 text-xs ml-2">{f.topic} · Grade {f.grade}</span>
+              </div>
+              <span className="text-xs font-mono text-slate-600">{f.diagramType}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* The question card */}
+        {family && <QuestionCard key={family.id} family={family} />}
+
+        {/* Explainer */}
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">What this means for the platform</p>
+          <div className="flex flex-col gap-2.5">
+            {[
+              ["♾️", "Infinite variants", "One question template generates unlimited versions — students never see the same numbers twice"],
+              ["🤖", "AI updates everything", "Change a value and the mark scheme recalculates automatically — no manual editing"],
+              ["📐", "Pixel-perfect diagrams", "SVG renders crisply at any screen size — far better than a scanned image on a phone"],
+              ["🚩", "Honest flagging", "Complex diagrams (apparatus, maps, biological drawings) are flagged for manual image upload instead"],
+            ].map(([i, t, d]) => (
+              <div key={t} className="flex gap-3">
+                <span className="text-lg flex-shrink-0">{i}</span>
+                <div>
+                  <p className="text-white text-sm font-semibold">{t}</p>
+                  <p className="text-slate-500 text-xs">{d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
