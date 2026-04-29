@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>paperpool — Free Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!--
+  ANONYMOUS TRACKING — HOW THIS WORKS
+  ─────────────────────────────────────────────────────────────────────
+  No cookies. No login. No personal data. GDPR-safe.
+
+  We use localStorage to accumulate aggregate session data in the
+  visitor's own browser, then POST a single anonymous summary to
+  our analytics endpoint (window.ANALYTICS_ENDPOINT) when they leave
+  or at natural breakpoints.
+
+  What we record per session:
+    - session_id: random UUID generated fresh each page load (not
+      stored between sessions — genuinely ephemeral)
+    - topics_attempted: array of topic ids touched
+    - questions_attempted: integer
+    - marks_earned / marks_possible: integers
+    - hint_used_count: integer
+    - teacher_cta_tapped: boolean
+    - papers_section_visited: boolean
+    - exam_mode_used: boolean
+    - approx_minutes: time on page / 60
+    - timestamp: ISO date (day precision only — no time)
+    - user_agent_category: 'mobile' | 'tablet' | 'desktop' (no UA string)
+
+  What we DO NOT record:
+    - Any identifier that persists between sessions
+    - IP address (never sent — server should not log it)
+    - Browser fingerprint
+    - Exact answers given
+    - Any PII whatsoever
+
+  To receive this data, set window.ANALYTICS_ENDPOINT to a URL that
+  accepts POST with JSON body. The endpoint should:
+    - Accept and discard the IP address
+    - Store only the JSON payload
+    - Return 200 OK
+
+  A simple Supabase Edge Function or a £0/month Cloudflare Worker
+  is sufficient. Without the endpoint set, events are logged to
+  console only — no network calls.
+  ─────────────────────────────────────────────────────────────────────
+-->
+<script>
+// Set this to your analytics endpoint URL when deploying.
+// Leave as null to run in console-only mode during development.
+window.ANALYTICS_ENDPOINT = null;
+
+// ── ANONYMOUS ANALYTICS ──────────────────────────────────────────────────────
+const Analytics = (() => {
+  const sid = crypto.randomUUID?.() || Math.random().toString(36).slice(2);
+  const startTime = Date.now();
+  const ua = navigator.userAgent;
+  const deviceCat = /Mobi|Android/i.test(ua) ? 'mobile' : /Tablet|iPad/i.test(ua) ? 'tablet' : 'desktop';
+
+  let data = {
+    session_id: sid,
+    timestamp: new Date().toISOString().slice(0, 10), // day only
+    device: deviceCat,
+    topics_attempted: [],
+    questions_attempted: 0,
+    marks_earned: 0,
+    marks_possible: 0,
+    hints_used: 0,
+    teacher_cta_tapped: false,
+    papers_section_visited: false,
+    exam_mode_used: false,
+    approx_minutes: 0,
+  };
+
+  function track(event, payload = {}) {
+    switch (event) {
+      case 'topic_start':
+        if (!data.topics_attempted.includes(payload.topic))
+          data.topics_attempted.push(payload.topic);
+        break;
+      case 'question_answered':
+        data.questions_attempted++;
+        data.marks_earned += payload.earned || 0;
+        data.marks_possible += payload.possible || 0;
+        break;
+      case 'hint_used':
+        data.hints_used++;
+        break;
+      case 'teacher_cta':
+        data.teacher_cta_tapped = true;
+        break;
+      case 'papers_visited':
+        data.papers_section_visited = true;
+        break;
+      case 'exam_used':
+        data.exam_mode_used = true;
+        break;
+    }
+    // Console log in dev
+    if (!window.ANALYTICS_ENDPOINT) {
+      console.log('[paperpool analytics]', event, payload, { ...data });
+    }
+  }
+
+  function flush() {
+    data.approx_minutes = Math.round((Date.now() - startTime) / 60000);
+    if (window.ANALYTICS_ENDPOINT && data.questions_attempted > 0) {
+      // Use sendBeacon so it fires even on page close
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      navigator.sendBeacon(window.ANALYTICS_ENDPOINT, blob);
+    }
+  }
+
+  // Flush on page unload
+  window.addEventListener('pagehide', flush);
+  window.addEventListener('beforeunload', flush);
+  // Also flush every 5 minutes for long sessions
+  setInterval(flush, 5 * 60 * 1000);
+
+  return { track };
+})();
+</script>
+
+<style>
+:root{
+  --bg:#0a0a16;--surface:rgba(255,255,255,0.045);--border:rgba(255,255,255,0.09);
+  --text:#f1f5f9;--muted:#64748b;
+  --indigo:#6366f1;--cyan:#0891b2;--emerald:#059669;--amber:#d97706;--rose:#e11d48;--violet:#7c3aed;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── LANDING ── */
+.landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;text-align:center;position:relative;overflow:hidden;}
+.landing-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(99,102,241,0.18),transparent 55%),radial-gradient(ellipse at 70% 80%,rgba(8,145,178,0.13),transparent 55%);pointer-events:none;}
+.logo-hero{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#6366f1,#0891b2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 12px 40px rgba(99,102,241,0.4);animation:popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;}
+@keyframes popIn{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
+h1.hero-title{font-family:'Playfair Display',serif;font-size:clamp(36px,8vw,56px);font-weight:900;line-height:1.05;margin-bottom:12px;animation:fadeUp 0.5s ease 0.1s both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+h1.hero-title span{color:var(--cyan);}
+.hero-sub{font-size:clamp(15px,4vw,18px);color:#94a3b8;max-width:440px;margin:0 auto 24px;line-height:1.65;animation:fadeUp 0.5s ease 0.2s both;}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px;animation:fadeUp 0.5s ease 0.3s both;}
+.badge{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:99px;border:1px solid;}
+.btn-start{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;font-size:17px;font-weight:700;padding:16px 36px;border-radius:16px;border:none;cursor:pointer;box-shadow:0 8px 32px rgba(99,102,241,0.4);transition:all 0.2s;animation:fadeUp 0.5s ease 0.35s both;font-family:'DM Sans',sans-serif;}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(99,102,241,0.5);}
+.free-note{font-size:12px;color:var(--muted);margin-top:12px;animation:fadeUp 0.5s ease 0.45s both;}
+.features-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;max-width:520px;margin:36px auto 0;animation:fadeUp 0.5s ease 0.5s both;}
+.feature-tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:left;}
+.feature-tile .fi{font-size:22px;margin-bottom:8px;}
+.feature-tile h4{font-size:13px;font-weight:700;margin-bottom:3px;}
+.feature-tile p{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* ── APP SHELL ── */
+.app{display:none;flex-direction:column;min-height:100vh;}
+.app.visible{display:flex;}
+.topbar{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(10,10,22,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;flex-shrink:0;}
+.topbar-logo{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none;}
+.topbar-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#0891b2);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;font-size:14px;color:white;flex-shrink:0;}
+.topbar-text{font-family:'Playfair Display',serif;font-weight:700;font-size:16px;}
+.topbar-text span{color:var(--cyan);}
+.topbar-free{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(5,150,105,0.15);color:#6ee7b7;border:1px solid rgba(5,150,105,0.3);margin-left:4px;white-space:nowrap;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.session-score{font-size:12px;font-weight:700;color:#fcd34d;white-space:nowrap;}
+.btn-teacher{font-size:11px;font-weight:700;padding:6px 11px;border-radius:8px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#a5b4fc;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all 0.15s;}
+.btn-teacher:hover{background:rgba(99,102,241,0.28);}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{display:flex;background:rgba(10,10,22,0.97);border-top:1px solid var(--border);padding:6px 8px;flex-shrink:0;position:sticky;bottom:0;z-index:40;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border-radius:10px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:9px;font-weight:700;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.nav-btn.active,.nav-btn:hover{color:var(--text);}
+.nav-btn.active{color:var(--indigo);background:rgba(99,102,241,0.12);}
+.nav-btn .ni{font-size:18px;line-height:1;}
+
+/* ── SHARED ── */
+.page{padding:16px;max-width:500px;margin:0 auto;width:100%;flex:1;}
+.page-title{margin-bottom:16px;}
+.page-title h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+.page-title p{font-size:13px;color:var(--muted);line-height:1.5;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.tag{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid;}
+.btn{padding:12px 18px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.btn-primary{background:var(--indigo);color:white;}
+.btn-primary:hover{background:#4f46e5;}
+.btn-amber{background:var(--amber);color:white;}
+.btn-amber:hover{opacity:0.9;}
+.w-full{width:100%;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center;}
+.stat-tile .sv{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.stat-tile .sl{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* ── TOPICS ── */
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.topic-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:8px;}
+.topic-card:hover{transform:translateY(-2px);border-color:rgba(99,102,241,0.35);}
+.topic-icon{font-family:'DM Mono',monospace;font-size:18px;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ── QUESTION ── */
+.q-meta-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;}
+.q-eyebrow{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;}
+.q-source{font-size:11px;color:var(--muted);}
+.progress-dots{display:flex;gap:5px;margin-bottom:14px;align-items:center;}
+.dot{height:5px;border-radius:99px;transition:all 0.3s;}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;}
+.q-card p{font-size:15px;font-weight:600;line-height:1.65;}
+.diagram-area{background:rgba(0,0,0,0.25);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;justify-content:center;}
+.field-label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.field-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;}
+.hint-btn{font-size:11px;color:var(--indigo);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;}
+.hint-box{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:12px;margin-bottom:10px;}
+.hint-box p{font-size:13px;color:rgba(165,180,252,0.9);line-height:1.6;}
+.working-area{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;resize:none;outline:none;line-height:1.6;margin-bottom:10px;transition:border-color 0.15s;}
+.working-area:focus{border-color:rgba(99,102,241,0.5);}
+.answer-wrap{background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;transition:border-color 0.2s;}
+.answer-wrap:focus-within{border-color:rgba(99,102,241,0.5);}
+.answer-wrap.correct{border-color:rgba(5,150,105,0.6);background:rgba(5,150,105,0.07);}
+.answer-wrap.wrong{border-color:rgba(225,29,72,0.5);background:rgba(225,29,72,0.06);}
+.answer-input{flex:1;background:none;border:none;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;}
+.answer-input::placeholder{color:var(--muted);}
+.mark-row{display:flex;align-items:flex-start;gap:8px;padding:10px;border-radius:10px;border:1px solid var(--border);margin-bottom:6px;}
+.mark-row.awarded{border-color:rgba(5,150,105,0.35);background:rgba(5,150,105,0.08);}
+.mark-code{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0;margin-top:1px;}
+.mistakes-box{background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.2);border-radius:12px;padding:12px;margin-bottom:12px;}
+.mistakes-box h4{font-size:10px;font-weight:700;color:#fcd34d;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.mistakes-box ul{padding-left:14px;}
+.mistakes-box li{font-size:12px;color:#94a3b8;margin-bottom:4px;line-height:1.5;}
+
+/* ── PAPERS ── */
+.papers-intro{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:14px;margin-bottom:16px;}
+.papers-intro p{font-size:13px;color:#94a3b8;line-height:1.7;}
+.papers-intro strong{color:#a5b4fc;}
+.year-group{margin-bottom:16px;}
+.year-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+.paper-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;transition:border-color 0.15s;}
+.paper-row:hover{border-color:rgba(99,102,241,0.3);}
+.paper-name{flex:1;font-size:13px;font-weight:500;color:var(--text);}
+.paper-links{display:flex;gap:6px;flex-shrink:0;}
+.paper-link{font-size:11px;font-weight:700;padding:5px 10px;border-radius:7px;text-decoration:none;border:1px solid;transition:all 0.15s;}
+.paper-link.qp{background:rgba(99,102,241,0.12);color:#a5b4fc;border-color:rgba(99,102,241,0.25);}
+.paper-link.qp:hover{background:rgba(99,102,241,0.25);}
+.paper-link.ms{background:rgba(5,150,105,0.1);color:#6ee7b7;border-color:rgba(5,150,105,0.25);}
+.paper-link.ms:hover{background:rgba(5,150,105,0.22);}
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.filter-tab{font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.filter-tab.active{border-color:var(--indigo);color:var(--indigo);background:rgba(99,102,241,0.1);}
+
+/* ── TEACHER MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:0 0 0 0;}
+.overlay.open{display:flex;animation:fadeIn 0.2s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:#111120;border:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+.modal h2{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:6px;}
+.modal-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;}
+.step-num{width:28px;height:28px;border-radius:50%;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#a5b4fc;flex-shrink:0;margin-top:1px;}
+.step-body{font-size:13px;color:#94a3b8;line-height:1.65;}
+
+/* ── TEACHER BANNER ── */
+.teacher-banner{background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(8,145,178,0.08));border:1px solid rgba(99,102,241,0.22);border-radius:16px;padding:16px;margin:0 16px 0;max-width:468px;margin-left:auto;margin-right:auto;display:none;}
+.teacher-banner h3{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:5px;}
+.teacher-banner p{font-size:12px;color:#94a3b8;line-height:1.65;margin-bottom:10px;}
+.btn-cta{display:inline-flex;align-items:center;gap:6px;background:var(--indigo);color:white;font-size:13px;font-weight:700;padding:9px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.btn-cta:hover{background:#4f46e5;}
+
+/* ── EXAM ── */
+.timer-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.timer-track{flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+.timer-fill{height:100%;border-radius:99px;transition:width 1s linear,background 0.5s;}
+.timer-lbl{font-family:'DM Mono',monospace;font-weight:700;font-size:13px;flex-shrink:0;}
+.exam-result{background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(8,145,178,0.15));border:1px solid rgba(99,102,241,0.3);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;}
+
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:rgba(99,102,241,0.3);border-radius:99px;}
+@media(min-width:500px){body{display:flex;justify-content:center;background:#060610;}body>*{width:100%;max-width:480px;}}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div class="landing" id="landing">
+  <div class="landing-bg"></div>
+  <div class="logo-hero"><span style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:white;">P</span></div>
+  <h1 class="hero-title">paper<span>pool</span><br>free revision</h1>
+  <p class="hero-sub">Real exam-style questions. Instant mark schemes. Download full past papers. No login, no tracking, just revision.</p>
+  <div class="hero-badges">
+    <span class="badge" style="background:rgba(99,102,241,0.12);color:#a5b4fc;border-color:rgba(99,102,241,0.25);">📐 Original questions</span>
+    <span class="badge" style="background:rgba(8,145,178,0.12);color:#67e8f9;border-color:rgba(8,145,178,0.25);">✓ Method marks</span>
+    <span class="badge" style="background:rgba(5,150,105,0.12);color:#6ee7b7;border-color:rgba(5,150,105,0.25);">📄 Full OCR past papers</span>
+    <span class="badge" style="background:rgba(255,255,255,0.07);color:#94a3b8;border-color:rgba(255,255,255,0.15);">🔒 No login needed</span>
+  </div>
+  <button class="btn-start" onclick="startApp()">Start revising →</button>
+  <p class="free-note">Free forever · OCR GCSE · No account · Built for students</p>
+  <div class="features-row">
+    <div class="feature-tile"><div class="fi">📐</div><h4>Original questions</h4><p>Written by maths teachers, styled like real exams, covering key GCSE topics</p></div>
+    <div class="feature-tile"><div class="fi">✏️</div><h4>Show working</h4><p>Method marks awarded for your working — just like a real examiner would</p></div>
+    <div class="feature-tile"><div class="fi">📄</div><h4>Full past papers</h4><p>Download complete OCR GCSE papers direct from OCR, 2020–2024</p></div>
+    <div class="feature-tile"><div class="fi">⏱</div><h4>Exam mode</h4><p>Timed mixed questions under real exam conditions to build technique</p></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="topbar">
+    <a class="topbar-logo" onclick="showTab('practice')">
+      <div class="topbar-mark">P</div>
+      <div class="topbar-text">paper<span>pool</span></div>
+      <span class="topbar-free">free</span>
+    </a>
+    <div class="topbar-right">
+      <span class="session-score" id="session-score" style="display:none;"></span>
+      <button class="btn-teacher" onclick="openTeacher()">For teachers →</button>
+    </div>
+  </div>
+
+  <div class="teacher-banner" id="teacher-banner">
+    <h3>Enjoying this? 👋</h3>
+    <p>Show your maths teacher — schools get the full platform free for a whole term, with class tracking, spaced repetition, and a complete question bank.</p>
+    <button class="btn-cta" onclick="teacherCTA()">Tell my teacher →</button>
+  </div>
+
+  <div id="app-content" style="flex:1;overflow-y:auto;"></div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-practice" onclick="showTab('practice')"><span class="ni">✏</span>Practice</button>
+    <button class="nav-btn" id="nav-exam" onclick="showTab('exam')"><span class="ni">⏱</span>Exam</button>
+    <button class="nav-btn" id="nav-papers" onclick="showTab('papers')"><span class="ni">📄</span>Papers</button>
+  </div>
+</div>
+
+<!-- Teacher modal -->
+<div class="overlay" id="teacher-overlay" onclick="closeTeacher()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2>For teachers &amp; schools</h2>
+    <p style="font-size:13px;color:#94a3b8;line-height:1.7;margin-bottom:16px;">Your students are using paperpool free to revise for OCR GCSE Maths. The full school platform gives every student unlimited questions, spaced repetition, class progress tracking, and exam simulation — completely free for your first term.</p>
+    <div class="modal-step"><div class="step-num">1</div><div class="step-body">Go to <strong style="color:#a5b4fc;">paperpool.co.uk/schools</strong> and request a free trial for your school</div></div>
+    <div class="modal-step"><div class="step-num">2</div><div class="step-body">We'll create your school account and give you a School Code your students enter to join — takes 5 minutes</div></div>
+    <div class="modal-step"><div class="step-num">3</div><div class="step-body">Full access for your entire class for one term, no credit card required</div></div>
+    <div class="modal-step"><div class="step-num">4</div><div class="step-body">At the end of term, continue for <strong style="color:#a5b4fc;">under £1 per pupil per year</strong> — or walk away, no questions asked</div></div>
+    <div style="background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.2);border-radius:12px;padding:12px;margin:16px 0;">
+      <p style="font-size:12px;color:#6ee7b7;line-height:1.6;">Every question on paperpool is written or verified by a qualified maths teacher before going live. The full platform includes spaced repetition, XP and streaks to keep students engaged, and a teacher dashboard showing exactly where each student is struggling.</p>
+    </div>
+    <button class="btn w-full" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);margin-top:4px;" onclick="closeTeacher()">Close</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+// All questions are ORIGINAL — written in exam style, not reproduced from papers.
+// Topics and style mirror OCR GCSE Maths specification.
+
+const TOPICS = [
+  {
+    id:'algebra', name:'Algebra', icon:'χ', color:'#6366f1',
+    questions:[
+      {
+        id:'a1',sub:'Linear equations',grade:'3',marks:3,
+        text:'Solve 4x − 3 = 17',
+        hint:'Add 3 to both sides first to get 4x on its own, then divide.',
+        ms:[
+          {c:'M1',d:'Add 3 to both sides: 4x = 20',color:'#6366f1'},
+          {c:'A1',d:'Divide both sides by 4',color:'#0891b2'},
+          {c:'A1',d:'x = 5',color:'#0891b2'},
+        ],
+        answers:['5','x=5','x = 5'],
+        mistakes:['Subtracting 17 instead of dealing with the −3 first','Dividing before isolating 4x','Arithmetic slips'],
+        diagram:null,
+      },
+      {
+        id:'a2',sub:'Expanding brackets',grade:'4',marks:3,
+        text:'Expand and simplify (x + 4)(x − 3)',
+        hint:'Multiply every term in the first bracket by every term in the second. Use FOIL or the grid method.',
+        ms:[
+          {c:'M1',d:'Correct expansion attempt — at least 3 correct terms',color:'#6366f1'},
+          {c:'A1',d:'x² − 3x + 4x − 12',color:'#0891b2'},
+          {c:'A1',d:'x² + x − 12',color:'#0891b2'},
+        ],
+        answers:['x²+x−12','x²+x-12','x^2+x-12','x² + x − 12'],
+        mistakes:['Sign error: 4 × (−3) = −12, not +12','Forgetting to collect the x terms','Only multiplying first terms'],
+        diagram:null,
+      },
+      {
+        id:'a3',sub:'Factorising quadratics',grade:'6',marks:3,
+        text:'Factorise x² + 7x + 10',
+        hint:'Find two numbers that multiply to +10 and add to +7.',
+        ms:[
+          {c:'M1',d:'Correct method — two numbers that multiply to 10 and sum to 7',color:'#6366f1'},
+          {c:'A1',d:'Numbers are 2 and 5',color:'#0891b2'},
+          {c:'A1',d:'(x + 2)(x + 5)',color:'#0891b2'},
+        ],
+        answers:['(x+2)(x+5)','(x + 2)(x + 5)','(x+5)(x+2)'],
+        mistakes:['Using numbers that add to 10 or multiply to 7','Sign errors if confused with different question types','Not checking by expanding back'],
+        diagram:null,
+      },
+      {
+        id:'a4',sub:'Sequences',grade:'4',marks:3,
+        text:'The nth term of a sequence is 3n − 2. Write down the first four terms of the sequence.',
+        hint:'Substitute n = 1, 2, 3, 4 into the formula one at a time.',
+        ms:[
+          {c:'M1',d:'Correct substitution for at least two values',color:'#6366f1'},
+          {c:'A1',d:'1, 4, 7, 10',color:'#0891b2'},
+          {c:'A1',d:'All four terms correct',color:'#0891b2'},
+        ],
+        answers:['1,4,7,10','1, 4, 7, 10','1 4 7 10'],
+        mistakes:['Using 3n + 2 instead of 3n − 2','Starting at n = 0','Arithmetic errors in substitution'],
+        diagram:null,
+      },
+      {
+        id:'a5',sub:'Solving quadratics',grade:'7',marks:4,
+        text:'Solve x² − 5x + 6 = 0',
+        hint:'Try factorising first. What two numbers multiply to +6 and add to −5?',
+        ms:[
+          {c:'M1',d:'Attempt to factorise: brackets that give x²',color:'#6366f1'},
+          {c:'A1',d:'(x − 2)(x − 3) = 0',color:'#0891b2'},
+          {c:'A1',d:'x = 2',color:'#0891b2'},
+          {c:'A1',d:'x = 3',color:'#0891b2'},
+        ],
+        answers:['2','3','x=2','x=3'],
+        mistakes:['Wrong signs in the brackets','Only finding one solution','Using quadratic formula but making errors with discriminant'],
+        diagram:null,
+      },
+    ]
+  },
+  {
+    id:'geometry', name:'Geometry', icon:'△', color:'#0891b2',
+    questions:[
+      {
+        id:'g1',sub:"Pythagoras",grade:'5',marks:3,
+        text:'A right-angled triangle has legs of length 8 cm and 15 cm. Find the length of the hypotenuse.',
+        hint:'Use a² + b² = c² where c is the hypotenuse.',
+        ms:[
+          {c:'M1',d:'8² + 15² = c²',color:'#6366f1'},
+          {c:'A1',d:'64 + 225 = 289',color:'#0891b2'},
+          {c:'A1',d:'c = √289 = 17 cm',color:'#0891b2'},
+        ],
+        answers:['17','17 cm','17.0'],
+        mistakes:['Adding sides without squaring','Forgetting to square root','Squaring incorrectly: 8² = 16'],
+        diagram:{type:'triangle',a:8,b:15},
+      },
+      {
+        id:'g2',sub:'Angles in triangles',grade:'3',marks:2,
+        text:'A triangle has angles 72°, 53° and x°. Find x.',
+        hint:'Angles in any triangle add up to 180°.',
+        ms:[
+          {c:'M1',d:'72 + 53 + x = 180',color:'#6366f1'},
+          {c:'A1',d:'x = 180 − 125 = 55°',color:'#0891b2'},
+        ],
+        answers:['55','55°'],
+        mistakes:['Using 360° instead of 180°','Arithmetic errors'],
+        diagram:{type:'angles',a:72,b:53},
+      },
+      {
+        id:'g3',sub:'Area of a circle',grade:'4',marks:3,
+        text:'Find the area of a circle with radius 7 cm. Give your answer in terms of π.',
+        hint:'Area = πr². Square the radius first.',
+        ms:[
+          {c:'M1',d:'Area = π × 7²',color:'#6366f1'},
+          {c:'A1',d:'= π × 49',color:'#0891b2'},
+          {c:'A1',d:'= 49π cm²',color:'#0891b2'},
+        ],
+        answers:['49π','49π cm²','49 pi','49π cm²'],
+        mistakes:['Using circumference formula (2πr)','Using diameter (14) as radius','Not squaring the radius'],
+        diagram:null,
+      },
+      {
+        id:'g4',sub:'Volume of a cylinder',grade:'6',marks:4,
+        text:'Find the volume of a cylinder with radius 5 cm and height 12 cm. Give your answer to 3 significant figures.',
+        hint:'Volume of cylinder = πr²h. Work out r² first.',
+        ms:[
+          {c:'M1',d:'V = π × 5² × 12',color:'#6366f1'},
+          {c:'A1',d:'= π × 25 × 12 = 300π',color:'#0891b2'},
+          {c:'A1',d:'= 942.477…',color:'#0891b2'},
+          {c:'A1',d:'= 942 cm³ (3 s.f.)',color:'#0891b2'},
+        ],
+        answers:['942','942 cm³','942.'],
+        mistakes:['Using diameter instead of radius','Forgetting to square the radius','Rounding errors — watch significant figures'],
+        diagram:null,
+      },
+    ]
+  },
+  {
+    id:'statistics', name:'Statistics', icon:'∑', color:'#059669',
+    questions:[
+      {
+        id:'s1',sub:'Mean — reverse calculation',grade:'4',marks:3,
+        text:'The mean of 6 numbers is 9. Five of the numbers are 7, 11, 8, 12 and 5. Find the sixth number.',
+        hint:'Find the total of all six numbers first, then subtract the five you know.',
+        ms:[
+          {c:'M1',d:'Total = 6 × 9 = 54',color:'#6366f1'},
+          {c:'A1',d:'54 − (7+11+8+12+5) = 54 − 43',color:'#0891b2'},
+          {c:'A1',d:'Sixth number = 11',color:'#0891b2'},
+        ],
+        answers:['11'],
+        mistakes:['Using 6 × 5 for total','Not subtracting all five numbers','Arithmetic errors in sum'],
+        diagram:null,
+      },
+      {
+        id:'s2',sub:'Probability',grade:'4',marks:3,
+        text:'A bag has 4 red, 6 blue and 2 yellow counters. A counter is chosen at random. What is the probability it is red?',
+        hint:'P(event) = number of favourable outcomes ÷ total outcomes.',
+        ms:[
+          {c:'M1',d:'Total counters = 4 + 6 + 2 = 12',color:'#6366f1'},
+          {c:'A1',d:'P(red) = 4/12',color:'#0891b2'},
+          {c:'A1',d:'= 1/3',color:'#0891b2'},
+        ],
+        answers:['1/3','4/12','0.333','0.33'],
+        mistakes:['Using just 4 in denominator','Not simplifying 4/12','Adding wrong to get total'],
+        diagram:null,
+      },
+      {
+        id:'s3',sub:'Frequency table mean',grade:'5',marks:4,
+        text:'The frequency table shows scores in a quiz:\nScore: 1, 2, 3, 4, 5\nFrequency: 3, 7, 10, 8, 2\nCalculate the mean score.',
+        hint:'Find f×x for each row, add them all up, then divide by the total frequency.',
+        ms:[
+          {c:'M1',d:'Multiply each score by its frequency: 3, 14, 30, 32, 10',color:'#6366f1'},
+          {c:'A1',d:'Sum of fx = 89',color:'#0891b2'},
+          {c:'A1',d:'Total frequency = 30',color:'#0891b2'},
+          {c:'A1',d:'Mean = 89 ÷ 30 = 2.97 (3 s.f.)',color:'#0891b2'},
+        ],
+        answers:['2.97','89/30','2.966','2.9666'],
+        mistakes:['Adding scores without multiplying by frequency','Dividing by 5 (number of rows) instead of 30','Arithmetic errors in fx calculation'],
+        diagram:null,
+      },
+    ]
+  },
+  {
+    id:'number', name:'Number', icon:'#', color:'#d97706',
+    questions:[
+      {
+        id:'n1',sub:'Standard form',grade:'5',marks:2,
+        text:'Write 0.0000072 in standard form.',
+        hint:'Standard form is A × 10ⁿ where 1 ≤ A < 10. Count decimal places moved to the right.',
+        ms:[
+          {c:'B1',d:'7.2 (correct significant figures)',color:'#6366f1'},
+          {c:'B1',d:'× 10⁻⁶ (correct power)',color:'#0891b2'},
+        ],
+        answers:['7.2 × 10⁻⁶','7.2×10⁻⁶','7.2 x 10^-6'],
+        mistakes:['Positive power instead of negative','Getting power wrong: count carefully (6 places)','Writing 72 × 10⁻⁷'],
+        diagram:null,
+      },
+      {
+        id:'n2',sub:'Percentage increase',grade:'4',marks:3,
+        text:'A jacket costs £85. It is reduced by 20% in a sale. Find the sale price.',
+        hint:'Find 20% of £85 first, then subtract it. Or multiply £85 by 0.8.',
+        ms:[
+          {c:'M1',d:'20% of 85 = 0.2 × 85 or 85 × 0.8',color:'#6366f1'},
+          {c:'A1',d:'= 17 or 68',color:'#0891b2'},
+          {c:'A1',d:'Sale price = £68',color:'#0891b2'},
+        ],
+        answers:['68','£68','68.00'],
+        mistakes:['Finding 20% and forgetting to subtract','Adding instead of subtracting','Finding 80% of wrong value'],
+        diagram:null,
+      },
+      {
+        id:'n3',sub:"Reverse percentages",grade:'7',marks:3,
+        text:'After a 25% increase, the price of a phone is £375. Find the original price.',
+        hint:'£375 represents 125% of the original price. Divide to find 1%, then multiply by 100.',
+        ms:[
+          {c:'M1',d:'375 ÷ 125 × 100 or 375 ÷ 1.25',color:'#6366f1'},
+          {c:'A1',d:'= 300',color:'#0891b2'},
+          {c:'A1',d:'Original price = £300',color:'#0891b2'},
+        ],
+        answers:['300','£300'],
+        mistakes:['Subtracting 25% from 375 (this is wrong for reverse)','Dividing by 0.25 instead of 1.25','Not recognising this as a reverse percentage'],
+        diagram:null,
+      },
+    ]
+  },
+  {
+    id:'surds', name:'Surds', icon:'√', color:'#7c3aed',
+    questions:[
+      {
+        id:'su1',sub:'Simplifying',grade:'7',marks:2,
+        text:'Simplify √48.',
+        hint:'Find the largest perfect square that is a factor of 48. Try 4, 9, 16...',
+        ms:[
+          {c:'M1',d:'√16 × √3 or correct identification of 16 as largest square factor',color:'#6366f1'},
+          {c:'A1',d:'4√3',color:'#0891b2'},
+        ],
+        answers:['4√3','4 √3','4root3'],
+        mistakes:['Using √4 × √12 (not largest square factor)','Writing √48 = √16 + √3','Incorrect: 4√3 ≠ 4 × 3 = 12'],
+        diagram:null,
+      },
+      {
+        id:'su2',sub:'Rationalising',grade:'8',marks:3,
+        text:'Rationalise the denominator of 6/√3. Simplify your answer.',
+        hint:'Multiply top and bottom by √3 to remove the surd from the denominator.',
+        ms:[
+          {c:'M1',d:'Multiply numerator and denominator by √3',color:'#6366f1'},
+          {c:'A1',d:'6√3 / 3',color:'#0891b2'},
+          {c:'A1',d:'= 2√3',color:'#0891b2'},
+        ],
+        answers:['2√3','2 √3'],
+        mistakes:['Multiplying denominator only','Not simplifying 6√3/3 to 2√3','Using wrong multiplier'],
+        diagram:null,
+      },
+    ]
+  },
+  {
+    id:'trigonometry', name:'Trigonometry', icon:'θ', color:'#0d9488',
+    questions:[
+      {
+        id:'t1',sub:'SOH CAH TOA',grade:'6',marks:3,
+        text:'In a right-angled triangle, the adjacent side is 9 cm and the angle is 40°. Find the length of the hypotenuse.',
+        hint:'Which trig ratio uses adjacent and hypotenuse? CAH — cos θ = adjacent ÷ hypotenuse.',
+        ms:[
+          {c:'M1',d:'cos 40° = 9 ÷ hypotenuse',color:'#6366f1'},
+          {c:'A1',d:'Hypotenuse = 9 ÷ cos 40°',color:'#0891b2'},
+          {c:'A1',d:'= 11.7 cm (3 s.f.)',color:'#0891b2'},
+        ],
+        answers:['11.7','11.74','11.7 cm'],
+        mistakes:['Using sin or tan instead of cos','Multiplying by cos 40° instead of dividing','Rounding too early'],
+        diagram:null,
+      },
+      {
+        id:'t2',sub:'Finding an angle',grade:'6',marks:3,
+        text:'In a right-angled triangle, the opposite side is 6 cm and the hypotenuse is 10 cm. Find the angle x.',
+        hint:'SOH: sin x = opposite ÷ hypotenuse. Use inverse sin (sin⁻¹) to find the angle.',
+        ms:[
+          {c:'M1',d:'sin x = 6/10 = 0.6',color:'#6366f1'},
+          {c:'A1',d:'x = sin⁻¹(0.6)',color:'#0891b2'},
+          {c:'A1',d:'x = 36.9° (1 d.p.)',color:'#0891b2'},
+        ],
+        answers:['36.9','36.87','36.9°'],
+        mistakes:['Using cos or tan','Forgetting to use inverse trig','Writing 0.6° as the answer'],
+        diagram:null,
+      },
+    ]
+  },
+];
+
+// ── OCR PAST PAPERS (direct links to ocr.org.uk) ──────────────────────────────
+const PAPERS = [
+  {
+    year:'2024', series:'November',
+    papers:[
+      {name:'Foundation Paper 1',      qp:'https://www.ocr.org.uk/Images/741961-question-paper-paper-1.pdf',  ms:'https://www.ocr.org.uk/Images/741962-mark-scheme-paper-1.pdf'},
+      {name:'Foundation Paper 2 (NC)', qp:'https://www.ocr.org.uk/Images/741970-question-paper-paper-2.pdf',  ms:'https://www.ocr.org.uk/Images/741963-mark-scheme-paper-2.pdf'},
+      {name:'Foundation Paper 3',      qp:'https://www.ocr.org.uk/Images/741971-question-paper-paper-3.pdf',  ms:'https://www.ocr.org.uk/Images/741964-mark-scheme-paper-3.pdf'},
+      {name:'Higher Paper 4',          qp:'https://www.ocr.org.uk/Images/741972-question-paper-paper-4.pdf',  ms:'https://www.ocr.org.uk/Images/741965-mark-scheme-paper-4.pdf'},
+      {name:'Higher Paper 5 (NC)',     qp:'https://www.ocr.org.uk/Images/741973-question-paper-paper-5.pdf',  ms:'https://www.ocr.org.uk/Images/741966-mark-scheme-paper-5.pdf'},
+      {name:'Higher Paper 6',          qp:'https://www.ocr.org.uk/Images/741974-question-paper-paper-6.pdf',  ms:'https://www.ocr.org.uk/Images/741967-mark-scheme-paper-6.pdf'},
+    ]
+  },
+  {
+    year:'2024', series:'June',
+    papers:[
+      {name:'Foundation Paper 1',      qp:'https://www.ocr.org.uk/Images/727817-question-paper-paper-1.pdf',  ms:'https://www.ocr.org.uk/Images/727824-mark-scheme-paper-1.pdf'},
+      {name:'Foundation Paper 2 (NC)', qp:'https://www.ocr.org.uk/Images/727818-question-paper-paper-2.pdf',  ms:'https://www.ocr.org.uk/Images/727825-mark-scheme-paper-2.pdf'},
+      {name:'Foundation Paper 3',      qp:'https://www.ocr.org.uk/Images/727819-question-paper-paper-3.pdf',  ms:'https://www.ocr.org.uk/Images/727826-mark-scheme-paper-3.pdf'},
+      {name:'Higher Paper 4',          qp:'https://www.ocr.org.uk/Images/727820-question-paper-paper-4.pdf',  ms:'https://www.ocr.org.uk/Images/727827-mark-scheme-paper-4.pdf'},
+      {name:'Higher Paper 5 (NC)',     qp:'https://www.ocr.org.uk/Images/727821-question-paper-paper-5.pdf',  ms:'https://www.ocr.org.uk/Images/727828-mark-scheme-paper-5.pdf'},
+      {name:'Higher Paper 6',          qp:'https://www.ocr.org.uk/Images/727822-question-paper-paper-6.pdf',  ms:'https://www.ocr.org.uk/Images/727829-mark-scheme-paper-6.pdf'},
+    ]
+  },
+  {
+    year:'2023', series:'November',
+    papers:[
+      {name:'Foundation Paper 1',      qp:'https://www.ocr.org.uk/Images/717048-question-paper-paper-1.pdf',  ms:'https://www.ocr.org.uk/Images/717049-mark-scheme-paper-1.pdf'},
+      {name:'Foundation Paper 2 (NC)', qp:'https://www.ocr.org.uk/Images/717057-question-paper-paper-2.pdf',  ms:'https://www.ocr.org.uk/Images/717050-mark-scheme-paper-2.pdf'},
+      {name:'Foundation Paper 3',      qp:'https://www.ocr.org.uk/Images/717058-question-paper-paper-3.pdf',  ms:'https://www.ocr.org.uk/Images/717051-mark-scheme-paper-3.pdf'},
+      {name:'Higher Paper 4',          qp:'https://www.ocr.org.uk/Images/717059-question-paper-paper-4.pdf',  ms:'https://www.ocr.org.uk/Images/717052-mark-scheme-paper-4.pdf'},
+      {name:'Higher Paper 5 (NC)',     qp:'https://www.ocr.org.uk/Images/717060-question-paper-paper-5.pdf',  ms:'https://www.ocr.org.uk/Images/717053-mark-scheme-paper-5.pdf'},
+      {name:'Higher Paper 6',          qp:'https://www.ocr.org.uk/Images/717061-question-paper-paper-6.pdf',  ms:'https://www.ocr.org.uk/Images/717054-mark-scheme-paper-6.pdf'},
+    ]
+  },
+  {
+    year:'2023', series:'June',
+    papers:[
+      {name:'Foundation Paper 1',      qp:'https://www.ocr.org.uk/Images/705050-question-paper-paper-1.pdf',  ms:'https://www.ocr.org.uk/Images/705057-mark-scheme-paper-1.pdf'},
+      {name:'Foundation Paper 2 (NC)', qp:'https://www.ocr.org.uk/Images/705051-question-paper-paper-2.pdf',  ms:'https://www.ocr.org.uk/Images/705058-mark-scheme-paper-2.pdf'},
+      {name:'Foundation Paper 3',      qp:'https://www.ocr.org.uk/Images/705052-question-paper-paper-3.pdf',  ms:'https://www.ocr.org.uk/Images/705059-mark-scheme-paper-3.pdf'},
+      {name:'Higher Paper 4',          qp:'https://www.ocr.org.uk/Images/705053-question-paper-paper-4.pdf',  ms:'https://www.ocr.org.uk/Images/705060-mark-scheme-paper-4.pdf'},
+      {name:'Higher Paper 5 (NC)',     qp:'https://www.ocr.org.uk/Images/705054-question-paper-paper-5.pdf',  ms:'https://www.ocr.org.uk/Images/705061-mark-scheme-paper-5.pdf'},
+      {name:'Higher Paper 6',          qp:'https://www.ocr.org.uk/Images/705055-question-paper-paper-6.pdf',  ms:'https://www.ocr.org.uk/Images/705062-mark-scheme-paper-6.pdf'},
+    ]
+  },
+  {
+    year:'2022', series:'November',
+    papers:[
+      {name:'Foundation Paper 1',      qp:'https://www.ocr.org.uk/Images/691704-question-paper-paper-1.pdf',  ms:'https://www.ocr.org.uk/Images/691710-mark-scheme-paper-1.pdf'},
+      {name:'Foundation Paper 2 (NC)', qp:'https://www.ocr.org.uk/Images/691745-question-paper-paper-2.pdf',  ms:'https://www.ocr.org.uk/Images/691711-mark-scheme-paper-2.pdf'},
+      {name:'Foundation Paper 3',      qp:'https://www.ocr.org.uk/Images/691746-question-paper-paper-3.pdf',  ms:'https://www.ocr.org.uk/Images/691712-mark-scheme-paper-3.pdf'},
+      {name:'Higher Paper 4',          qp:'https://www.ocr.org.uk/Images/691747-question-paper-paper-4.pdf',  ms:'https://www.ocr.org.uk/Images/691713-mark-scheme-paper-4.pdf'},
+      {name:'Higher Paper 5 (NC)',     qp:'https://www.ocr.org.uk/Images/691748-question-paper-paper-5.pdf',  ms:'https://www.ocr.org.uk/Images/691714-mark-scheme-paper-5.pdf'},
+      {name:'Higher Paper 6',          qp:'https://www.ocr.org.uk/Images/691749-question-paper-paper-6.pdf',  ms:'https://www.ocr.org.uk/Images/691715-mark-scheme-paper-6.pdf'},
+    ]
+  },
+  {
+    year:'2022', series:'June',
+    papers:[
+      {name:'Foundation Paper 1',      qp:'https://www.ocr.org.uk/Images/678149-question-paper-paper-1.pdf',  ms:'https://www.ocr.org.uk/Images/678156-mark-scheme-paper-1.pdf'},
+      {name:'Foundation Paper 2 (NC)', qp:'https://www.ocr.org.uk/Images/678150-question-paper-paper-2.pdf',  ms:'https://www.ocr.org.uk/Images/678157-mark-scheme-paper-2.pdf'},
+      {name:'Foundation Paper 3',      qp:'https://www.ocr.org.uk/Images/678151-question-paper-paper-3.pdf',  ms:'https://www.ocr.org.uk/Images/678158-mark-scheme-paper-3.pdf'},
+      {name:'Higher Paper 4',          qp:'https://www.ocr.org.uk/Images/678152-question-paper-paper-4.pdf',  ms:'https://www.ocr.org.uk/Images/678159-mark-scheme-paper-4.pdf'},
+      {name:'Higher Paper 5 (NC)',     qp:'https://www.ocr.org.uk/Images/678153-question-paper-paper-5.pdf',  ms:'https://www.ocr.org.uk/Images/678160-mark-scheme-paper-5.pdf'},
+      {name:'Higher Paper 6',          qp:'https://www.ocr.org.uk/Images/678154-question-paper-paper-6.pdf',  ms:'https://www.ocr.org.uk/Images/678161-mark-scheme-paper-6.pdf'},
+    ]
+  },
+  {
+    year:'2021',series:'Summer',
+    papers:[
+      {name:'Foundation Paper 1',      qp:'https://ocr.org.uk/Images/667695-question-paper-paper-1.pdf',      ms:'https://ocr.org.uk/Images/667701-mark-scheme-paper-1.pdf'},
+      {name:'Foundation Paper 2 (NC)', qp:'https://ocr.org.uk/Images/667696-question-paper-paper-2.pdf',      ms:'https://ocr.org.uk/Images/667702-mark-scheme-paper-2.pdf'},
+      {name:'Foundation Paper 3',      qp:'https://ocr.org.uk/Images/667697-question-paper-paper-3.pdf',      ms:'https://ocr.org.uk/Images/667703-mark-scheme-paper-3.pdf'},
+      {name:'Higher Paper 4',          qp:'https://ocr.org.uk/Images/667698-question-paper-paper-4.pdf',      ms:'https://ocr.org.uk/Images/667704-mark-scheme-paper-4.pdf'},
+      {name:'Higher Paper 5 (NC)',     qp:'https://ocr.org.uk/Images/667699-question-paper-paper-5.pdf',      ms:'https://ocr.org.uk/Images/667705-mark-scheme-paper-5.pdf'},
+      {name:'Higher Paper 6',          qp:'https://ocr.org.uk/Images/667700-question-paper-paper-6.pdf',      ms:'https://ocr.org.uk/Images/667706-mark-scheme-paper-6.pdf'},
+    ]
+  },
+  {
+    year:'2020',series:'Summer',
+    papers:[
+      {name:'Foundation Paper 1',      qp:'https://www.ocr.org.uk/Images/643913-question-paper-paper-1.pdf',  ms:'https://www.ocr.org.uk/Images/643919-mark-scheme-paper-1.pdf'},
+      {name:'Foundation Paper 2 (NC)', qp:'https://www.ocr.org.uk/Images/643914-question-paper-paper-2.pdf',  ms:'https://www.ocr.org.uk/Images/643920-mark-scheme-paper-2.pdf'},
+      {name:'Foundation Paper 3',      qp:'https://www.ocr.org.uk/Images/643915-question-paper-paper-3.pdf',  ms:'https://www.ocr.org.uk/Images/643921-mark-scheme-paper-3.pdf'},
+      {name:'Higher Paper 4',          qp:'https://www.ocr.org.uk/Images/643916-question-paper-paper-4.pdf',  ms:'https://www.ocr.org.uk/Images/643922-mark-scheme-paper-4.pdf'},
+    ]
+  },
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let session = { answered:0, earned:0, possible:0, correct:0 };
+let currentTopic = null;
+let currentQIdx = 0;
+let hintShown = false;
+let submitted = false;
+let examState = null;
+let activeTab = 'practice';
+let paperFilter = 'all';
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function norm(v){
+  return (v||'').toLowerCase().trim()
+    .replace(/\s+/g,'').replace(/x\s*=/g,'')
+    .replace(/−/g,'-').replace(/–/g,'-')
+    .replace(/[()]/g,'').replace(/cm[²³]?/g,'').replace(/°/g,'');
+}
+function checkAnswer(given, answers){
+  const ng=norm(given);
+  return answers.some(a=>{
+    if(norm(a)===ng) return true;
+    const nv=parseFloat(ng),na=parseFloat(norm(a));
+    if(!isNaN(nv)&&!isNaN(na)) return Math.abs(nv-na)<0.02;
+    return false;
+  });
+}
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+
+function drawTriangle(a,b,W=260,H=155){
+  const pad=32,scale=Math.min((W-pad*2)/b,(H-pad*2)/a);
+  const bx=pad,by=pad+a*scale,cx=pad+b*scale,cy=pad+a*scale,ax=pad,ay=pad;
+  const mx=(ax+cx)/2,my=(ay+cy)/2;
+  const ang=-Math.atan2(ay-cy,cx-ax)*180/Math.PI;
+  const c=Math.sqrt(a*a+b*b);
+  const cl=Number.isInteger(c)?c+' cm':c.toFixed(2)+' cm';
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%">
+    <polygon points="${ax},${ay} ${bx},${by} ${cx},${cy}" fill="rgba(8,145,178,0.1)" stroke="#0891b2" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="${bx}" y="${by-11}" width="11" height="11" fill="none" stroke="rgba(8,145,178,0.5)" stroke-width="1.5"/>
+    <text x="${ax-26}" y="${(ay+by)/2+5}" fill="#67e8f9" font-size="13" font-family="Georgia" font-weight="bold">${a} cm</text>
+    <text x="${(bx+cx)/2-15}" y="${by+19}" fill="#67e8f9" font-size="13" font-family="Georgia" font-weight="bold">${b} cm</text>
+    <text x="${mx+5}" y="${my-5}" fill="#a5b4fc" font-size="13" font-family="Georgia" font-weight="bold" transform="rotate(${ang},${mx},${my})">? cm</text>
+  </svg>`;
+}
+
+function drawAngles(a,b){
+  const x=180-a-b;
+  return `<svg width="260" height="170" viewBox="0 0 260 170" style="max-width:100%">
+    <polygon points="130,20 28,150 232,150" fill="rgba(8,145,178,0.1)" stroke="#0891b2" stroke-width="2" stroke-linejoin="round"/>
+    <text x="104" y="48" fill="#67e8f9" font-size="13" font-family="Georgia" font-weight="bold">${a}°</text>
+    <text x="36" y="143" fill="#67e8f9" font-size="13" font-family="Georgia" font-weight="bold">${b}°</text>
+    <text x="186" y="143" fill="#a5b4fc" font-size="14" font-family="Georgia" font-weight="bold">x°</text>
+  </svg>`;
+}
+
+function renderDiagram(d){
+  if(!d) return '';
+  if(d.type==='triangle') return `<div class="diagram-area">${drawTriangle(d.a,d.b)}</div>`;
+  if(d.type==='angles') return `<div class="diagram-area">${drawAngles(d.a,d.b)}</div>`;
+  return '';
+}
+
+function updateScore(){
+  const el=document.getElementById('session-score');
+  if(session.answered>0){
+    const p=Math.round(session.earned/session.possible*100);
+    el.textContent=`${session.earned}/${session.possible} (${p}%)`;
+    el.style.display='';
+  }
+  if(session.correct>=3) document.getElementById('teacher-banner').style.display='';
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function startApp(){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  showTab('practice');
+}
+
+function showTab(tab){
+  activeTab=tab;
+  ['practice','exam','papers'].forEach(t=>{
+    document.getElementById('nav-'+t)?.classList.toggle('active',t===tab);
+  });
+  if(tab==='practice') renderTopics();
+  if(tab==='exam') renderExamLobby();
+  if(tab==='papers'){ Analytics.track('papers_visited'); renderPapers(); }
+}
+
+// ── PRACTICE ─────────────────────────────────────────────────────────────────
+function renderTopics(){
+  const el=document.getElementById('app-content');
+  el.innerHTML=`<div class="page">
+    <div class="page-title">
+      <h2>Choose a topic</h2>
+      <p>Original OCR-style questions written by maths teachers. All key GCSE topics covered.</p>
+    </div>
+    ${session.answered>0?`<div class="stats-bar">
+      <div class="stat-tile"><div class="sv" style="color:#6366f1;">${session.answered}</div><div class="sl">Questions</div></div>
+      <div class="stat-tile"><div class="sv" style="color:#059669;">${session.earned}/${session.possible}</div><div class="sl">Marks</div></div>
+      <div class="stat-tile"><div class="sv" style="color:#d97706;">${Math.round(session.earned/session.possible*100)}%</div><div class="sl">Score</div></div>
+    </div>`:''}
+    <div class="topic-grid">
+      ${TOPICS.map(t=>`<div class="topic-card" onclick="startTopic('${t.id}')">
+        <div class="topic-icon" style="background:${t.color}18;color:${t.color};">${t.icon}</div>
+        <div style="font-weight:700;font-size:14px;">${t.name}</div>
+        <div style="font-size:11px;color:var(--muted);">${t.questions.length} question${t.questions.length!==1?'s':''}</div>
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:16px;text-align:center;">
+      <button class="btn" style="background:rgba(8,145,178,0.12);color:#67e8f9;border:1px solid rgba(8,145,178,0.25);" onclick="showTab('papers')">
+        📄 Download full past papers →
+      </button>
+    </div>
+  </div>`;
+}
+
+function startTopic(id){
+  currentTopic=TOPICS.find(t=>t.id===id);
+  currentQIdx=0;
+  Analytics.track('topic_start',{topic:id});
+  showQuestion();
+}
+
+function showQuestion(){
+  if(!currentTopic||currentQIdx>=currentTopic.questions.length){showComplete();return;}
+  const q=currentTopic.questions[currentQIdx];
+  q.ms.forEach(m=>m.awarded=false);
+  hintShown=false;submitted=false;
+  const el=document.getElementById('app-content');
+  el.innerHTML=`<div class="page">
+    <div class="q-meta-row">
+      <div><div class="q-eyebrow">${currentTopic.name} · ${q.sub}</div><div class="q-source">Original question · OCR GCSE style · Grade ${q.grade}</div></div>
+      <div style="display:flex;gap:5px;">
+        <span class="tag" style="background:rgba(99,102,241,0.12);color:#a5b4fc;border-color:rgba(99,102,241,0.25);">Grade ${q.grade}</span>
+        <span class="tag" style="background:rgba(255,255,255,0.07);color:#64748b;border-color:rgba(255,255,255,0.15);">${q.marks}m</span>
+      </div>
+    </div>
+    <div class="progress-dots">
+      ${currentTopic.questions.map((_,i)=>`<div class="dot" style="flex:1;background:${i<currentQIdx?'#10b981':i===currentQIdx?'#6366f1':'rgba(255,255,255,0.12)'}"></div>`).join('')}
+      <span style="font-size:10px;color:#64748b;margin-left:4px;flex-shrink:0;">${currentQIdx+1}/${currentTopic.questions.length}</span>
+    </div>
+    ${renderDiagram(q.diagram)}
+    <div class="q-card"><p>${q.text.replace(/\n/g,'<br>')}</p></div>
+    <div id="hint-zone"></div>
+    <div class="field-label-row"><span class="field-label">Working <span style="font-weight:400;text-transform:none;color:#475569;">(earns method marks)</span></span></div>
+    <textarea class="working-area" id="working" rows="4" placeholder="Show your working here…"></textarea>
+    <div class="field-label-row"><span class="field-label">Answer</span></div>
+    <div class="answer-wrap" id="awrap"><input class="answer-input" id="answer" placeholder="Your answer…" onkeydown="if(event.key==='Enter')doSubmit()"><span id="aicon" style="font-size:18px;display:none;"></span></div>
+    <button class="btn btn-primary w-full" id="sbtn" onclick="doSubmit()">Submit answer</button>
+    <div id="result-zone"></div>
+  </div>`;
+  renderHintZone(q);
+}
+
+function renderHintZone(q){
+  document.getElementById('hint-zone').innerHTML=hintShown
+    ?`<div class="hint-box" style="margin-bottom:10px;"><p>💡 ${q.hint}</p></div>`
+    :`<button class="hint-btn" onclick="revealHint()" style="margin-bottom:10px;">💡 Show hint</button>`;
+}
+function revealHint(){
+  Analytics.track('hint_used');
+  hintShown=true;
+  renderHintZone(currentTopic.questions[currentQIdx]);
+}
+
+function doSubmit(){
+  if(submitted) return;
+  const q=currentTopic.questions[currentQIdx];
+  const w=document.getElementById('working').value.trim();
+  const a=document.getElementById('answer').value.trim();
+  const hasW=w.length>3;
+  const correct=checkAnswer(a,q.answers);
+  q.ms.forEach((m,i)=>{ m.awarded=i===0?hasW:correct; });
+  const earned=q.ms.filter(m=>m.awarded).length;
+  session.answered++;session.earned+=earned;session.possible+=q.marks;
+  if(correct)session.correct++;
+  Analytics.track('question_answered',{earned,possible:q.marks,topic:currentTopic.id});
+  updateScore();submitted=true;
+  const wrap=document.getElementById('awrap');
+  wrap.classList.add(correct?'correct':'wrong');
+  const ic=document.getElementById('aicon');
+  ic.textContent=correct?'✓':'✗';ic.style.display='';ic.style.color=correct?'#10b981':'#e11d48';
+  document.getElementById('sbtn').style.display='none';
+  const pct=Math.round(earned/q.marks*100);
+  document.getElementById('result-zone').innerHTML=`
+    <div style="background:${pct>=70?'rgba(5,150,105,0.1)':'rgba(245,158,11,0.1)'};border:1px solid ${pct>=70?'rgba(5,150,105,0.3)':'rgba(245,158,11,0.3)'};border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div><div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:${pct>=70?'#6ee7b7':'#fcd34d'}">${earned} / ${q.marks}</div>
+      <div style="font-size:12px;color:#64748b;margin-top:2px;">${correct?'Correct ✓':'Answer: '+q.answers[0]}</div></div>
+      <span style="font-size:30px;">${pct>=75?'🎯':pct>=40?'📝':'📚'}</span>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Mark scheme</div>
+    ${q.ms.map(m=>`<div class="mark-row ${m.awarded?'awarded':''}">
+      <span class="mark-code" style="background:${m.color}22;color:${m.color};">${m.c}</span>
+      <span style="font-size:13px;color:#94a3b8;flex:1;line-height:1.5;">${m.d}</span>
+      <span style="font-size:14px;">${m.awarded?'<span style="color:#10b981">✓</span>':'<span style="color:#334155">○</span>'}</span>
+    </div>`).join('')}
+    ${q.mistakes?`<div class="mistakes-box" style="margin-top:10px;">
+      <h4>⚠ Common mistakes</h4>
+      <ul>${q.mistakes.map(m=>`<li>${m}</li>`).join('')}</ul>
+    </div>`:''}
+    <button class="btn btn-primary w-full" style="margin-top:4px;" onclick="nextQ()">
+      ${currentQIdx<currentTopic.questions.length-1?'Next question →':'See topic summary →'}
+    </button>`;
+}
+
+function nextQ(){ currentQIdx++; showQuestion(); }
+
+function showComplete(){
+  const el=document.getElementById('app-content');
+  el.innerHTML=`<div class="page">
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:6px;">Topic complete!</h2>
+      <p style="color:#64748b;font-size:13px;">${currentTopic.name} · ${currentTopic.questions.length} questions done</p>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-tile"><div class="sv" style="color:#6366f1;">${session.answered}</div><div class="sl">Total done</div></div>
+      <div class="stat-tile"><div class="sv" style="color:#059669;">${session.earned}/${session.possible}</div><div class="sl">Marks</div></div>
+      <div class="stat-tile"><div class="sv" style="color:#d97706;">${Math.round(session.earned/session.possible*100)}%</div><div class="sl">Score</div></div>
+    </div>
+    <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:16px;margin-bottom:12px;">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;">Want to track your progress?</h3>
+      <p style="font-size:12px;color:#94a3b8;line-height:1.65;margin-bottom:10px;">The full paperpool platform saves your scores, identifies your weak topics, and uses spaced repetition to make sure problem areas come back around — free for your whole school for a term.</p>
+      <button class="btn-cta" onclick="teacherCTA()">Tell my teacher →</button>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="renderTopics()">Try another topic</button>
+      <button class="btn" style="flex:1;background:rgba(8,145,178,0.12);color:#67e8f9;border:1px solid rgba(8,145,178,0.25);" onclick="showTab('papers')">Full papers →</button>
+    </div>
+  </div>`;
+}
+
+// ── EXAM MODE ─────────────────────────────────────────────────────────────────
+function renderExamLobby(){
+  Analytics.track('exam_used');
+  examState={qs:shuffle(TOPICS.flatMap(t=>t.questions)).slice(0,6),cur:0,ans:{},wrk:{},timeLeft:360,timer:null};
+  const el=document.getElementById('app-content');
+  el.innerHTML=`<div class="page">
+    <div class="page-title"><h2>Exam Mode</h2><p>6 mixed questions · 6 minutes · No feedback until the end</p></div>
+    <div style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.22);border-radius:14px;padding:14px;margin-bottom:16px;">
+      <div style="font-weight:700;font-size:13px;color:#fcd34d;margin-bottom:8px;">📋 Before you start</div>
+      ${['6 minutes on the clock — keep an eye on it','No hints, no mark scheme until the end','Show all working — method marks are awarded','Attempt every question, even if unsure'].map(r=>`<div style="display:flex;gap:8px;font-size:13px;color:#94a3b8;margin-bottom:5px;"><span style="color:#fcd34d;">▸</span>${r}</div>`).join('')}
+    </div>
+    ${examState.qs.map((q,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:10px 12px;margin-bottom:6px;">
+      <span style="font-size:12px;color:#64748b;">Q${i+1} · ${TOPICS.find(t=>t.questions.includes(q))?.name||''} · Grade ${q.grade}</span>
+      <span class="tag" style="background:rgba(99,102,241,0.12);color:#a5b4fc;border-color:rgba(99,102,241,0.25);">${q.marks}m</span>
+    </div>`).join('')}
+    <button class="btn btn-amber w-full" style="margin-top:8px;font-size:15px;padding:14px;" onclick="beginExam()">Start exam ⏱</button>
+    <button class="btn w-full" style="margin-top:8px;background:var(--surface);border:1px solid var(--border);color:var(--muted);" onclick="showTab('practice')">← Back</button>
+  </div>`;
+}
+
+function beginExam(){
+  examState.timer=setInterval(()=>{
+    examState.timeLeft--;updateExamTimer();
+    if(examState.timeLeft<=0){clearInterval(examState.timer);finishExam();}
+  },1000);
+  renderExamQ();
+}
+
+function updateExamTimer(){
+  const f=document.getElementById('etf'),l=document.getElementById('etl');
+  if(!f||!l)return;
+  const p=(examState.timeLeft/360)*100;
+  const c=examState.timeLeft>120?'#6366f1':examState.timeLeft>60?'#f59e0b':'#ef4444';
+  f.style.width=p+'%';f.style.background=c;l.style.color=c;
+  l.textContent=`${String(Math.floor(examState.timeLeft/60)).padStart(2,'0')}:${String(examState.timeLeft%60).padStart(2,'0')}`;
+}
+
+function renderExamQ(){
+  const q=examState.qs[examState.cur];
+  const last=examState.cur===examState.qs.length-1;
+  document.getElementById('app-content').innerHTML=`<div class="page">
+    <div class="timer-row">
+      <div class="timer-track"><div class="timer-fill" id="etf" style="width:100%;background:#6366f1;"></div></div>
+      <span class="timer-lbl" id="etl" style="color:#6366f1;">06:00</span>
+    </div>
+    <div class="progress-dots">
+      ${examState.qs.map((_,i)=>`<div class="dot" style="flex:1;background:${i<examState.cur?'#10b981':i===examState.cur?'#6366f1':'rgba(255,255,255,0.1)'}"></div>`).join('')}
+      <span style="font-size:10px;color:#64748b;flex-shrink:0;margin-left:4px;">Q${examState.cur+1}/${examState.qs.length}</span>
+    </div>
+    ${renderDiagram(q.diagram)}
+    <div class="q-card"><p>${q.text.replace(/\n/g,'<br>')}</p></div>
+    <div class="field-label-row"><span class="field-label">Working</span></div>
+    <textarea class="working-area" id="ew" rows="4" placeholder="Show your working…">${examState.wrk[examState.cur]||''}</textarea>
+    <div class="field-label-row"><span class="field-label">Answer</span></div>
+    <div class="answer-wrap"><input class="answer-input" id="ea" placeholder="Your answer…" value="${examState.ans[examState.cur]||''}"></div>
+    <button class="btn btn-amber w-full" style="font-size:15px;padding:14px;" onclick="examNext()">${last?'Finish exam':'Next →'}</button>
+  </div>`;
+  updateExamTimer();
+}
+
+function examNext(){
+  examState.ans[examState.cur]=document.getElementById('ea')?.value||'';
+  examState.wrk[examState.cur]=document.getElementById('ew')?.value||'';
+  if(examState.cur<examState.qs.length-1){examState.cur++;renderExamQ();}
+  else finishExam();
+}
+
+function finishExam(){
+  clearInterval(examState.timer);
+  let earned=0,possible=0;
+  const results=examState.qs.map((q,i)=>{
+    const a=examState.ans[i]||'',w=examState.wrk[i]||'';
+    const ok=checkAnswer(a,q.answers),hw=w.trim().length>3;
+    const m=ok?(hw?q.marks:Math.max(1,q.marks-1)):hw?1:0;
+    earned+=m;possible+=q.marks;
+    return{q,ok,m};
+  });
+  const pct=Math.round(earned/possible*100);
+  const grade=pct>=88?'9':pct>=80?'8':pct>=72?'7':pct>=64?'6':pct>=56?'5':pct>=48?'4':pct>=40?'3':'U';
+  session.answered+=examState.qs.length;session.earned+=earned;session.possible+=possible;
+  Analytics.track('question_answered',{earned,possible,topic:'exam'});
+  updateScore();
+  document.getElementById('app-content').innerHTML=`<div class="page">
+    <div class="exam-result">
+      <div style="font-size:11px;color:rgba(165,180,252,0.7);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Exam complete</div>
+      <div style="font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:white;line-height:1;">${earned}/${possible}</div>
+      <div style="font-size:14px;color:rgba(148,163,184,0.8);margin-top:6px;">Estimated grade: <strong style="color:white;">Grade ${grade}</strong></div>
+    </div>
+    ${results.map((r,i)=>`<div style="background:${r.ok?'rgba(5,150,105,0.08)':'rgba(225,29,72,0.07)'};border:1px solid ${r.ok?'rgba(5,150,105,0.28)':'rgba(225,29,72,0.28)'};border-radius:12px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:700;font-size:13px;">Q${i+1} · ${r.q.sub}</span><span style="font-weight:800;color:${r.ok?'#6ee7b7':'#fda4af'}">${r.m}/${r.q.marks}</span></div>
+      <p style="font-size:12px;color:#64748b;">${r.q.text.replace(/\n.*/,'').substring(0,55)}…</p>
+      ${!r.ok?`<p style="font-size:12px;color:#64748b;margin-top:3px;">Answer: <span style="color:white;font-family:'DM Mono',monospace;">${r.q.answers[0]}</span></p>`:''}
+    </div>`).join('')}
+    <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:14px;margin:8px 0;">
+      <p style="font-size:13px;font-weight:700;margin-bottom:5px;">Want to track this over time?</p>
+      <p style="font-size:12px;color:#94a3b8;line-height:1.65;margin-bottom:10px;">The full paperpool platform identifies exactly which topics are costing you marks and brings them back around with spaced repetition — free for your school for a term.</p>
+      <button class="btn-cta" onclick="teacherCTA()">Tell my teacher →</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="renderExamLobby()">Try again</button>
+      <button class="btn" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--muted);" onclick="showTab('practice')">Topics</button>
+    </div>
+  </div>`;
+}
+
+// ── PAPERS ────────────────────────────────────────────────────────────────────
+function renderPapers(){
+  const filtered=paperFilter==='all'?PAPERS:PAPERS.filter(g=>
+    paperFilter==='foundation'?g.papers.some(p=>p.name.includes('Foundation')):
+    g.papers.some(p=>p.name.includes('Higher'))
+  );
+  document.getElementById('app-content').innerHTML=`<div class="page">
+    <div class="page-title">
+      <h2>OCR Past Papers</h2>
+      <p>Complete question papers and mark schemes direct from OCR (2020–2024). These are official OCR documents hosted on ocr.org.uk.</p>
+    </div>
+    <div class="papers-intro">
+      <p><strong>How to use these:</strong> Download a question paper, attempt it under timed conditions, then check your answers against the mark scheme. For interactive practice with instant feedback, use the <span style="color:#a5b4fc;cursor:pointer;" onclick="showTab('practice')">Practice tab →</span></p>
+    </div>
+    <div class="filter-tabs">
+      <button class="filter-tab ${paperFilter==='all'?'active':''}" onclick="setPaperFilter('all')">All papers</button>
+      <button class="filter-tab ${paperFilter==='foundation'?'active':''}" onclick="setPaperFilter('foundation')">Foundation</button>
+      <button class="filter-tab ${paperFilter==='higher'?'active':''}" onclick="setPaperFilter('higher')">Higher</button>
+    </div>
+    ${filtered.map(g=>`
+      <div class="year-group">
+        <div class="year-label">${g.series} ${g.year}</div>
+        ${g.papers.filter(p=>
+          paperFilter==='all'?true:
+          paperFilter==='foundation'?p.name.includes('Foundation'):
+          p.name.includes('Higher')
+        ).map(p=>`<div class="paper-row">
+          <span class="paper-name">${p.name}</span>
+          <div class="paper-links">
+            <a class="paper-link qp" href="${p.qp}" target="_blank" rel="noopener noreferrer" onclick="Analytics.track('papers_visited')">Paper</a>
+            <a class="paper-link ms" href="${p.ms}" target="_blank" rel="noopener noreferrer">Mark scheme</a>
+          </div>
+        </div>`).join('')}
+      </div>`).join('')}
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;margin-top:4px;">
+      <p style="font-size:11px;color:#475569;line-height:1.6;">These papers are published by OCR (Cambridge Assessment) and hosted on ocr.org.uk. paperpool links directly to the source — we don't host copies of the papers. OCR GCSE Maths © OCR. All rights reserved.</p>
+    </div>
+  </div>`;
+}
+
+function setPaperFilter(f){
+  paperFilter=f;
+  renderPapers();
+}
+
+// ── TEACHER ───────────────────────────────────────────────────────────────────
+function teacherCTA(){
+  Analytics.track('teacher_cta');
+  openTeacher();
+}
+function openTeacher(){document.getElementById('teacher-overlay').classList.add('open');}
+function closeTeacher(){document.getElementById('teacher-overlay').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTeacher();});
+</script>
+</body>
+</html>
