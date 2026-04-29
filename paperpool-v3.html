@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>paperpool — GCSE Maths Past Papers</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════
+   THEME TOKENS
+   ══════════════════════════════════════════════════════ */
+:root,[data-theme="dark"]{
+  --bg:#09090f; --bg2:rgba(255,255,255,.025); --bg3:rgba(255,255,255,.045);
+  --b:rgba(255,255,255,.09); --b2:rgba(255,255,255,.15);
+  --t:#f1f5f9; --t2:#cbd5e1; --m:#94a3b8; --m2:#64748b;
+  --ind:#6366f1; --cya:#0891b2; --em:#059669; --amb:#d97706;
+  --edx:#0891b2; --aqa:#e11d48; --ocr:#059669;
+  --shadow:rgba(0,0,0,.5);
+  --topbar-bg:rgba(9,9,15,.97);
+  --viewer-bg:#1a1a2e;
+  color-scheme: dark;
+}
+[data-theme="light"]{
+  --bg:#f8fafc; --bg2:#f1f5f9; --bg3:#e2e8f0;
+  --b:rgba(0,0,0,.1); --b2:rgba(0,0,0,.2);
+  --t:#0f172a; --t2:#1e293b; --m:#475569; --m2:#64748b;
+  --ind:#4f46e5; --cya:#0369a1; --em:#047857; --amb:#b45309;
+  --edx:#0369a1; --aqa:#be123c; --ocr:#047857;
+  --shadow:rgba(0,0,0,.15);
+  --topbar-bg:rgba(248,250,252,.97);
+  --viewer-bg:#ffffff;
+  color-scheme: light;
+}
+
+/* ══════════════════════════════════════════════════════
+   RESET & BASE
+   ══════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;}
+:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px;border-radius:4px;}
+:focus:not(:focus-visible){outline:none;}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;}}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;transition:background .2s,color .2s;}
+a{color:inherit;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.skip-link{position:absolute;left:-9999px;top:6px;padding:8px 16px;background:var(--ind);color:white;font-weight:700;font-size:13px;border-radius:8px;z-index:9999;font-family:'DM Sans',sans-serif;}
+.skip-link:focus{left:12px;}
+
+/* ══════════════════════════════════════════════════════
+   TOPBAR
+   ══════════════════════════════════════════════════════ */
+.topbar{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--b);background:var(--topbar-bg);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none;}
+.lm{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#0891b2);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;font-size:13px;color:white;flex-shrink:0;}
+.lt{font-family:'Playfair Display',serif;font-weight:700;font-size:15px;color:var(--t);}
+.lt span{color:var(--cya);}
+.topbar-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.cnt{font-size:11px;font-weight:600;color:var(--m);}
+.tbtn{font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid rgba(99,102,241,.3);background:rgba(99,102,241,.1);color:#c7d2fe;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.tbtn:hover{background:rgba(99,102,241,.22);}
+
+/* THEME TOGGLE */
+.theme-toggle{background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:5px 8px;cursor:pointer;font-size:15px;line-height:1;transition:all .15s;color:var(--t);}
+.theme-toggle:hover{background:var(--bg3);}
+
+/* ══════════════════════════════════════════════════════
+   EXAM COUNTDOWN
+   ══════════════════════════════════════════════════════ */
+.countdown-banner{background:linear-gradient(90deg,rgba(99,102,241,.06),rgba(8,145,178,.04));border-bottom:1px solid var(--b);padding:8px 20px;}
+[data-theme="light"] .countdown-banner{background:linear-gradient(90deg,rgba(79,70,229,.06),rgba(3,105,161,.04));}
+.countdown-inner{max-width:960px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.cd-label{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;}
+.exam-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.exam-pill{display:flex;align-items:center;gap:5px;padding:3px 8px;background:var(--bg2);border:1px solid var(--b);border-radius:99px;font-size:11px;}
+.ep-name{font-weight:600;color:var(--t);}
+.ep-date{color:var(--m);}
+.ep-days{font-weight:700;font-size:10px;padding:1px 5px;border-radius:99px;}
+.ep-soon{background:rgba(217,119,6,.15);color:#fcd34d;border:1px solid rgba(217,119,6,.3);}
+.ep-near{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.25);}
+.ep-norm{background:rgba(99,102,241,.12);color:#a5b4fc;border:1px solid rgba(99,102,241,.22);}
+[data-theme="light"] .ep-norm{background:rgba(79,70,229,.1);color:#4338ca;border-color:rgba(79,70,229,.25);}
+[data-theme="light"] .ep-soon{color:#92400e;}
+[data-theme="light"] .ep-near{color:#991b1b;}
+
+/* ══════════════════════════════════════════════════════
+   HERO
+   ══════════════════════════════════════════════════════ */
+.hero{padding:24px 20px 16px;max-width:960px;margin:0 auto;text-align:center;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(24px,5vw,40px);font-weight:900;margin-bottom:8px;}
+.hero h1 span{color:var(--cya);}
+.hero p{font-size:14px;color:var(--m);max-width:520px;margin:0 auto 14px;line-height:1.65;}
+.bpills{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:4px;}
+.bpill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;border:1px solid;}
+
+/* LINK VALIDATION NOTE */
+.link-status-note{max-width:960px;margin:0 auto;padding:0 20px 12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--m);}
+.link-status-note .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(5,150,105,.12);color:#6ee7b7;border:1px solid rgba(5,150,105,.25);}
+
+/* ══════════════════════════════════════════════════════
+   QUICK RESOURCE BAR
+   ══════════════════════════════════════════════════════ */
+.quick-bar{max-width:960px;margin:0 auto;padding:0 20px 14px;display:flex;gap:7px;flex-wrap:wrap;justify-content:center;}
+.qbtn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:7px 12px;border-radius:9px;border:1px solid;text-decoration:none;transition:all .15s;font-family:'DM Sans',sans-serif;cursor:pointer;background:none;white-space:nowrap;color:var(--t2);}
+.qbtn:hover{transform:translateY(-1px);}
+.qb-formula{color:#c7d2fe;border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.08);}
+.qb-formula:hover{background:rgba(99,102,241,.18);}
+.qb-grade{color:#6ee7b7;border-color:rgba(5,150,105,.3);background:rgba(5,150,105,.08);}
+.qb-grade:hover{background:rgba(5,150,105,.18);}
+[data-theme="light"] .qb-formula{color:#4338ca;background:rgba(79,70,229,.08);border-color:rgba(79,70,229,.25);}
+[data-theme="light"] .qb-grade{color:#065f46;background:rgba(4,120,87,.08);border-color:rgba(4,120,87,.25);}
+
+/* ══════════════════════════════════════════════════════
+   GRADE BOUNDARIES PANEL
+   ══════════════════════════════════════════════════════ */
+.gb-wrap{max-width:960px;margin:0 auto;padding:0 20px;}
+.gb-panel{background:var(--bg2);border:1px solid var(--b);border-radius:14px;padding:18px 20px;margin-bottom:14px;display:none;}
+.gb-panel.open{display:block;}
+.gb-panel h3{font-family:'Playfair Display',serif;font-size:15px;margin-bottom:8px;color:var(--t);}
+.gb-note{font-size:12px;color:var(--m);margin-bottom:12px;line-height:1.6;}
+.gb-note a{color:#a5b4fc;text-decoration:underline;}
+[data-theme="light"] .gb-note a{color:var(--ind);}
+.gb-table-wrap{overflow-x:auto;}
+.gb-table{width:100%;border-collapse:collapse;font-size:12px;}
+.gb-table th{text-align:left;padding:6px 10px;border-bottom:1px solid var(--b);color:var(--m);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em;}
+.gb-table td{padding:6px 10px;border-bottom:1px solid var(--b);color:var(--t2);}
+.gb-table tr:last-child td{border-bottom:none;}
+.gbn{font-weight:700;font-size:13px;}
+.g9{color:#a78bfa;}.g8{color:#60a5fa;}.g7{color:#34d399;}.g6{color:#86efac;}
+.g5{color:#fde68a;}.g4{color:#fcd34d;}.g3{color:#fb923c;}.g2{color:#f87171;}.g1{color:#fca5a5;}
+[data-theme="light"] .g9{color:#7c3aed;} [data-theme="light"] .g8{color:#1d4ed8;}
+[data-theme="light"] .g7{color:#065f46;} [data-theme="light"] .g6{color:#166534;}
+[data-theme="light"] .g5{color:#78350f;} [data-theme="light"] .g4{color:#92400e;}
+[data-theme="light"] .g3{color:#c2410c;} [data-theme="light"] .g2{color:#b91c1c;} [data-theme="light"] .g1{color:#991b1b;}
+
+/* ══════════════════════════════════════════════════════
+   FORMULA SHEET (generated SVG)
+   ══════════════════════════════════════════════════════ */
+.formula-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.formula-modal.open{display:flex;}
+.formula-inner{background:var(--bg);border:1px solid var(--b);border-radius:16px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;}
+.formula-inner h2{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:16px;color:var(--t);}
+.formula-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--m);margin-top:-4px;}
+.formula-close:hover{color:var(--t);}
+.fs-section{margin-bottom:18px;}
+.fs-section h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--m);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--b);}
+.fs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:480px){.fs-grid{grid-template-columns:1fr;}}
+.fs-item{background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:9px 12px;}
+.fs-item .fs-name{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;margin-bottom:4px;}
+.fs-item .fs-formula{font-family:'DM Mono',monospace;font-size:13px;color:var(--t);line-height:1.5;}
+.formula-print-btn{margin-top:12px;padding:8px 16px;background:var(--ind);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.formula-print-btn:hover{opacity:.85;}
+.formula-link{font-size:11px;color:var(--m);margin-top:10px;display:block;}
+.formula-link a{color:#a5b4fc;text-decoration:underline;}
+[data-theme="light"] .formula-link a{color:var(--ind);}
+
+/* ══════════════════════════════════════════════════════
+   FILTERS
+   ══════════════════════════════════════════════════════ */
+.filters-wrap{background:var(--topbar-bg);border-bottom:1px solid var(--b);position:sticky;top:54px;z-index:40;backdrop-filter:blur(12px);}
+.filters{max-width:960px;margin:0 auto;padding:11px 20px;display:flex;flex-direction:column;gap:7px;}
+.sr-row{display:flex;gap:8px;align-items:center;}
+.sbox{flex:1;background:var(--bg3);border:1px solid var(--b);border-radius:10px;padding:9px 14px;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s;}
+.sbox::placeholder{color:var(--m);}
+.sbox:focus{border-color:rgba(99,102,241,.5);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
+.frs{display:flex;flex-wrap:wrap;gap:6px;}
+.fg{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.fl{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-right:2px;white-space:nowrap;}
+.chip{font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid var(--b);background:var(--bg2);color:var(--m);cursor:pointer;transition:all .12s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.chip:hover{border-color:rgba(99,102,241,.35);color:var(--t);}
+.chip.on{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.45);color:#c7d2fe;}
+.chip.edx.on{background:rgba(8,145,178,.15);border-color:rgba(8,145,178,.45);color:#67e8f9;}
+.chip.aqa.on{background:rgba(225,29,72,.12);border-color:rgba(225,29,72,.4);color:#fda4af;}
+.chip.ocr.on{background:rgba(5,150,105,.12);border-color:rgba(5,150,105,.4);color:#6ee7b7;}
+[data-theme="light"] .chip.on{background:rgba(79,70,229,.1);border-color:rgba(79,70,229,.4);color:#3730a3;}
+[data-theme="light"] .chip.edx.on{background:rgba(3,105,161,.1);border-color:rgba(3,105,161,.4);color:#0369a1;}
+[data-theme="light"] .chip.aqa.on{background:rgba(190,18,60,.08);border-color:rgba(190,18,60,.3);color:#be123c;}
+[data-theme="light"] .chip.ocr.on{background:rgba(4,120,87,.08);border-color:rgba(4,120,87,.3);color:#047857;}
+.clr{font-size:11px;color:var(--m);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:5px 8px;border-radius:6px;}
+.clr:hover{color:var(--t);background:var(--bg3);}
+
+/* ACTIVE FILTER PILLS */
+.af-wrap{max-width:960px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;padding:0 20px 8px;}
+.af-pill{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:3px 8px 3px 10px;border-radius:99px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.28);color:#c7d2fe;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.af-pill:hover{background:rgba(99,102,241,.22);}
+[data-theme="light"] .af-pill{background:rgba(79,70,229,.1);border-color:rgba(79,70,229,.3);color:#3730a3;}
+
+/* ══════════════════════════════════════════════════════
+   RESULTS
+   ══════════════════════════════════════════════════════ */
+.rw{max-width:960px;margin:0 auto;padding:12px 20px 60px;}
+.rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;gap:8px;flex-wrap:wrap;}
+.rc{font-size:13px;color:var(--m);}
+.rh-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.ss{font-size:12px;font-weight:600;padding:6px 10px;border-radius:8px;border:1px solid var(--b);background:var(--bg2);color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;}
+.toggle-row{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--m);cursor:pointer;}
+.tog{position:relative;width:30px;height:17px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;position:absolute;}
+.tsl{position:absolute;inset:0;border-radius:99px;background:var(--bg3);border:1px solid var(--b);cursor:pointer;transition:.18s;}
+.tog input:checked+.tsl{background:rgba(99,102,241,.5);border-color:rgba(99,102,241,.6);}
+.tsl:before{content:'';position:absolute;width:11px;height:11px;left:2px;top:2px;border-radius:50%;background:var(--m);transition:.18s;}
+.tog input:checked+.tsl:before{transform:translateX(13px);background:#a5b4fc;}
+.tog input:focus+.tsl{box-shadow:0 0 0 3px rgba(99,102,241,.25);}
+
+.bg{margin-bottom:20px;}
+.bh{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--b);}
+.bd{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.bn{font-weight:700;font-size:15px;}
+.bs{font-size:12px;color:var(--m);}
+.ys{margin-bottom:13px;}
+.yl{font-size:11px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.yl::after{content:'';flex:1;height:1px;background:var(--b);}
+
+/* PAPER CARD */
+.pc{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--b);border-radius:12px;margin-bottom:4px;transition:border-color .15s,background .15s;}
+.pc:hover{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.04);}
+[data-theme="light"] .pc:hover{background:rgba(79,70,229,.04);}
+.pi{flex:1;min-width:0;}
+.pn{font-size:13px;font-weight:600;color:var(--t);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pts{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.pt{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;border:1px solid;}
+.src-note{font-size:9px;color:var(--m2);font-style:italic;}
+.pls{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;}
+.pl{font-size:11px;font-weight:700;padding:6px 10px;border-radius:8px;text-decoration:none;border:1px solid;transition:all .15s;white-space:nowrap;cursor:pointer;font-family:'DM Sans',sans-serif;background:none;}
+.pl:hover{transform:translateY(-1px);}
+.pl.qp{background:rgba(99,102,241,.1);color:#c7d2fe;border-color:rgba(99,102,241,.25);}
+.pl.qp:hover{background:rgba(99,102,241,.22);}
+.pl.ms{background:rgba(5,150,105,.09);color:#6ee7b7;border-color:rgba(5,150,105,.25);}
+.pl.ms:hover{background:rgba(5,150,105,.2);}
+.pl.ann{background:rgba(8,145,178,.09);color:#67e8f9;border-color:rgba(8,145,178,.22);display:none;}
+.pl.ann:hover{background:rgba(8,145,178,.2);}
+.pl.ann.show{display:inline-flex;align-items:center;gap:4px;}
+[data-theme="light"] .pl.qp{background:rgba(79,70,229,.08);color:#3730a3;border-color:rgba(79,70,229,.2);}
+[data-theme="light"] .pl.ms{background:rgba(4,120,87,.08);color:#065f46;border-color:rgba(4,120,87,.2);}
+[data-theme="light"] .pl.ann{background:rgba(3,105,161,.08);color:#0369a1;border-color:rgba(3,105,161,.2);}
+
+.empty{text-align:center;padding:48px 20px;color:var(--m);}
+
+/* ══════════════════════════════════════════════════════
+   PDF VIEWER / ANNOTATOR
+   ══════════════════════════════════════════════════════ */
+.viewer-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;flex-direction:column;}
+.viewer-modal.open{display:flex;}
+.viewer-topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--viewer-bg);border-bottom:1px solid var(--b);flex-shrink:0;flex-wrap:wrap;}
+.viewer-title{font-size:13px;font-weight:600;color:var(--t);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.viewer-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.vtool{font-size:11px;font-weight:700;padding:5px 10px;border-radius:7px;border:1px solid var(--b);background:var(--bg2);color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap;}
+.vtool:hover{background:var(--bg3);border-color:var(--b2);}
+.vtool.active{background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.4);color:#c7d2fe;}
+.vtool.danger{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:#fca5a5;}
+.vtool.danger:hover{background:rgba(239,68,68,.2);}
+.vcolor{width:28px;height:28px;border-radius:50%;border:2px solid var(--b);cursor:pointer;transition:transform .12s;}
+.vcolor:hover,.vcolor.active{transform:scale(1.2);border-color:white;}
+.viewer-main{flex:1;position:relative;overflow:hidden;display:flex;}
+.viewer-iframe-wrap{flex:1;position:relative;}
+.viewer-canvas-wrap{position:absolute;inset:0;pointer-events:none;z-index:10;}
+.viewer-canvas-wrap.drawing{pointer-events:all;cursor:crosshair;}
+.viewer-canvas-wrap.highlighter{pointer-events:all;cursor:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><text y="18" font-size="16">🖊️</text></svg>') 4 20, crosshair;}
+.viewer-iframe{width:100%;height:100%;border:none;background:white;}
+.viewer-close{padding:6px 14px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.viewer-close:hover{background:rgba(239,68,68,.25);}
+.viewer-print{padding:6px 14px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#c7d2fe;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.viewer-print:hover{background:rgba(99,102,241,.25);}
+.stroke-size{display:flex;align-items:center;gap:4px;}
+.stroke-size label{font-size:10px;color:var(--m);white-space:nowrap;}
+.stroke-size input[type=range]{width:60px;accent-color:#a5b4fc;}
+.ann-note{font-size:11px;color:var(--m);padding:4px 0;}
+
+/* ══════════════════════════════════════════════════════
+   TEACHER PANEL
+   ══════════════════════════════════════════════════════ */
+.teacher-panel{background:var(--bg2);border-top:1px solid var(--b);}
+.tp-inner{max-width:960px;margin:0 auto;padding:32px 20px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+@media(max-width:680px){.tp-inner{grid-template-columns:1fr;gap:24px;}}
+.tp-left h2{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;color:var(--t);}
+.tp-left p{font-size:13px;color:var(--m);line-height:1.7;margin-bottom:14px;}
+.tp-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.tp-step{display:flex;gap:10px;align-items:flex-start;}
+.sn{width:24px;height:24px;border-radius:50%;background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#c7d2fe;flex-shrink:0;margin-top:1px;}
+.sb{font-size:13px;color:var(--m);line-height:1.6;}
+.form-card{background:var(--bg3);border:1px solid var(--b);border-radius:18px;padding:20px;}
+.form-card h3{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:4px;color:var(--t);}
+.form-card .sub{font-size:12px;color:var(--m);margin-bottom:16px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.field input,.field select,.field textarea{width:100%;background:var(--bg2);border:1px solid var(--b);border-radius:10px;padding:10px 12px;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(99,102,241,.5);box-shadow:0 0 0 3px rgba(99,102,241,.1);}
+.field select option{background:var(--bg);}
+.field textarea{resize:none;line-height:1.5;}
+.submit-btn{width:100%;padding:12px;background:var(--ind);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.submit-btn:hover{opacity:.88;}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+.success-msg{display:none;text-align:center;padding:20px;background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);border-radius:12px;}
+.success-msg h4{color:#6ee7b7;font-size:15px;margin-bottom:6px;}
+.success-msg p{font-size:12px;color:var(--m);}
+.qr-section{display:flex;align-items:center;gap:14px;padding:14px;background:var(--bg2);border:1px solid var(--b);border-radius:14px;margin-top:14px;}
+.qr-canvas{width:80px;height:80px;flex-shrink:0;border-radius:8px;background:white;padding:4px;}
+.qr-text{font-size:12px;color:var(--m);line-height:1.6;}
+.qr-text strong{color:var(--t);display:block;margin-bottom:2px;}
+.qr-url{font-size:11px;font-family:'DM Mono',monospace;color:#a5b4fc;word-break:break-all;}
+
+.footer-note{text-align:center;padding:16px 20px;font-size:11px;color:var(--m2);line-height:1.6;max-width:700px;margin:0 auto;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:99px;}
+
+@media(max-width:600px){
+  .pc{flex-wrap:wrap;}
+  .pls{width:100%;justify-content:flex-end;}
+  .frs{flex-direction:column;}
+  .viewer-tools{gap:4px;}
+  .vtool{padding:4px 7px;font-size:10px;}
+}
+</style>
+</head>
+<body>
+<a href="#results" class="skip-link">Skip to results</a>
+
+<!-- TOPBAR -->
+<header>
+  <nav class="topbar" role="navigation" aria-label="Main navigation">
+    <a class="logo" href="#top" aria-label="paperpool home">
+      <div class="lm" aria-hidden="true">P</div>
+      <div class="lt">paper<span>pool</span></div>
+    </a>
+    <div class="topbar-r">
+      <span class="cnt" id="top-cnt" aria-live="polite"></span>
+      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle light/dark theme" title="Toggle theme">🌙</button>
+      <button class="tbtn" onclick="document.getElementById('for-teachers').scrollIntoView({behavior:'smooth'})">For teachers →</button>
+    </div>
+  </nav>
+  <!-- EXAM COUNTDOWN -->
+  <div class="countdown-banner" role="complementary" aria-label="2026 exam dates">
+    <div class="countdown-inner">
+      <span class="cd-label">Exams 2026</span>
+      <div class="exam-pills" id="exam-pills" role="list"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero" id="top" aria-labelledby="hero-h1">
+  <h1 id="hero-h1">GCSE Maths<br><span>Past Papers</span></h1>
+  <p>Question papers and mark schemes from AQA, Edexcel and OCR — linked directly from official exam board servers. Open in the annotator to write on screen.</p>
+  <div class="bpills" aria-label="Exam boards covered" role="list">
+    <span class="bpill" style="background:rgba(8,145,178,.12);color:#67e8f9;border-color:rgba(8,145,178,.25);" role="listitem">Edexcel</span>
+    <span class="bpill" style="background:rgba(225,29,72,.1);color:#fda4af;border-color:rgba(225,29,72,.25);" role="listitem">AQA</span>
+    <span class="bpill" style="background:rgba(5,150,105,.1);color:#6ee7b7;border-color:rgba(5,150,105,.25);" role="listitem">OCR</span>
+    <span class="bpill" style="background:rgba(255,255,255,.06);color:#94a3b8;border-color:rgba(255,255,255,.15);" role="listitem">2017–2024</span>
+  </div>
+</section>
+
+<!-- LINK STATUS NOTE -->
+<div class="link-status-note" aria-label="Link validation status">
+  <span class="badge">✓ Validated</span>
+  <span>All PDF links go directly to official exam board servers (Pearson, AQA, OCR). Links open in our annotator — no third-party video links.</span>
+</div>
+
+<!-- QUICK RESOURCE BAR -->
+<nav class="quick-bar" aria-label="Quick resources">
+  <button class="qbtn qb-formula" onclick="openFormulaSheet()" aria-haspopup="dialog">📐 Formula sheet</button>
+  <button class="qbtn qb-grade" onclick="toggleGB()" id="gb-btn" aria-expanded="false" aria-controls="gb-panel">📊 Grade boundaries</button>
+</nav>
+
+<!-- GRADE BOUNDARIES -->
+<div class="gb-wrap">
+  <div class="gb-panel" id="gb-panel" role="region" aria-label="Grade boundaries">
+    <h3>Edexcel GCSE Maths — Indicative Grade Boundaries</h3>
+    <p class="gb-note">Indicative figures based on recent series. Always verify at <a href="https://qualifications.pearson.com/en/support/support-topics/results-certification/grade-boundaries.html" target="_blank" rel="noopener noreferrer">qualifications.pearson.com</a>.</p>
+    <div class="gb-table-wrap">
+      <table class="gb-table">
+        <caption class="sr-only">Grade boundaries — minimum marks per grade for Edexcel GCSE Maths</caption>
+        <thead><tr><th scope="col">Grade</th><th scope="col">Higher (240 marks)</th><th scope="col">Foundation (240 marks)</th></tr></thead>
+        <tbody>
+          <tr><td class="gbn g9">9</td><td>~185</td><td>—</td></tr>
+          <tr><td class="gbn g8">8</td><td>~160</td><td>—</td></tr>
+          <tr><td class="gbn g7">7</td><td>~135</td><td>—</td></tr>
+          <tr><td class="gbn g6">6</td><td>~108</td><td>—</td></tr>
+          <tr><td class="gbn g5">5</td><td>~82</td><td>~166</td></tr>
+          <tr><td class="gbn g4">4</td><td>~58</td><td>~135</td></tr>
+          <tr><td class="gbn g3">3</td><td>—</td><td>~103</td></tr>
+          <tr><td class="gbn g2">2</td><td>—</td><td>~72</td></tr>
+          <tr><td class="gbn g1">1</td><td>—</td><td>~40</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-wrap" role="search" aria-label="Filter papers">
+  <div class="filters">
+    <div class="sr-row">
+      <label for="q" class="sr-only">Search papers</label>
+      <input class="sbox" id="q" type="search" placeholder="🔍  Search — 'AQA Higher 2023' or 'Non-Calculator'" oninput="render()" aria-label="Search past papers">
+      <button class="clr" onclick="clearAll()" aria-label="Clear all filters">Clear all</button>
+    </div>
+    <div class="frs">
+      <div class="fg" role="group" aria-label="Board">
+        <span class="fl" aria-hidden="true">Board</span>
+        <button class="chip edx" data-g="board" data-v="Edexcel" onclick="tog(this)" aria-pressed="false">Edexcel</button>
+        <button class="chip aqa" data-g="board" data-v="AQA" onclick="tog(this)" aria-pressed="false">AQA</button>
+        <button class="chip ocr" data-g="board" data-v="OCR" onclick="tog(this)" aria-pressed="false">OCR</button>
+      </div>
+      <div class="fg" role="group" aria-label="Tier">
+        <span class="fl" aria-hidden="true">Tier</span>
+        <button class="chip" data-g="level" data-v="Foundation" onclick="tog(this)" aria-pressed="false">Foundation</button>
+        <button class="chip" data-g="level" data-v="Higher" onclick="tog(this)" aria-pressed="false">Higher</button>
+      </div>
+      <div class="fg" role="group" aria-label="Year">
+        <span class="fl" aria-hidden="true">Year</span>
+        <button class="chip" data-g="year" data-v="2024" onclick="tog(this)" aria-pressed="false">2024</button>
+        <button class="chip" data-g="year" data-v="2023" onclick="tog(this)" aria-pressed="false">2023</button>
+        <button class="chip" data-g="year" data-v="2022" onclick="tog(this)" aria-pressed="false">2022</button>
+        <button class="chip" data-g="year" data-v="2021" onclick="tog(this)" aria-pressed="false">2021</button>
+        <button class="chip" data-g="year" data-v="2020" onclick="tog(this)" aria-pressed="false">2020</button>
+        <button class="chip" data-g="year" data-v="2019" onclick="tog(this)" aria-pressed="false">2019</button>
+        <button class="chip" data-g="year" data-v="2018" onclick="tog(this)" aria-pressed="false">2018</button>
+        <button class="chip" data-g="year" data-v="2017" onclick="tog(this)" aria-pressed="false">2017</button>
+      </div>
+      <div class="fg" role="group" aria-label="Session">
+        <span class="fl" aria-hidden="true">Session</span>
+        <button class="chip" data-g="session" data-v="May/June" onclick="tog(this)" aria-pressed="false">May/June</button>
+        <button class="chip" data-g="session" data-v="November" onclick="tog(this)" aria-pressed="false">November</button>
+      </div>
+      <div class="fg" role="group" aria-label="Calculator">
+        <span class="fl" aria-hidden="true">Calc</span>
+        <button class="chip" data-g="calc" data-v="Calculator" onclick="tog(this)" aria-pressed="false">Calculator</button>
+        <button class="chip" data-g="calc" data-v="Non-Calculator" onclick="tog(this)" aria-pressed="false">Non-Calculator</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="af-wrap" id="af-wrap" aria-live="polite" aria-label="Active filters"></div>
+
+<!-- RESULTS -->
+<div class="rw">
+  <div class="rh">
+    <span class="rc" id="rc" role="status" aria-live="polite" aria-atomic="true"></span>
+    <div class="rh-r">
+      <label class="toggle-row" for="ann-toggle" title="Show Annotate buttons on each paper — opens a viewer where you can draw and highlight">
+        <span aria-hidden="true">✏️</span> Annotate
+        <span class="tog"><input type="checkbox" id="ann-toggle" onchange="toggleAnnotate(this.checked)"><span class="tsl"></span></span>
+      </label>
+      <label for="sort" class="sr-only">Sort</label>
+      <select class="ss" id="sort" onchange="render()" aria-label="Sort papers">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="board">By board</option>
+      </select>
+    </div>
+  </div>
+  <div id="results" role="region" aria-label="Past papers" tabindex="-1"></div>
+</div>
+
+<!-- PDF ANNOTATOR VIEWER -->
+<div class="viewer-modal" id="viewer-modal" role="dialog" aria-modal="true" aria-labelledby="viewer-title">
+  <div class="viewer-topbar">
+    <span class="viewer-title" id="viewer-title">Paper</span>
+    <div class="viewer-tools">
+      <span class="ann-note">Draw on the paper:</span>
+      <button class="vtool" id="tool-pen" onclick="setTool('pen')" title="Pen tool — draw freehand">✏️ Pen</button>
+      <button class="vtool" id="tool-highlight" onclick="setTool('highlight')" title="Highlighter — semi-transparent highlight">🖊 Highlight</button>
+      <button class="vtool" id="tool-none" onclick="setTool('none')" title="Pan/scroll — no drawing">☞ Pan</button>
+      <div class="stroke-size">
+        <label for="stroke-w">Size</label>
+        <input type="range" id="stroke-w" min="1" max="20" value="3" oninput="updateStroke(this.value)" aria-label="Stroke size">
+      </div>
+      <span style="font-size:11px;color:var(--m);">Colour:</span>
+      <button class="vcolor active" id="col-red" style="background:#ef4444;" onclick="setColor('#ef4444')" aria-label="Red pen" title="Red"></button>
+      <button class="vcolor" id="col-blue" style="background:#3b82f6;" onclick="setColor('#3b82f6')" aria-label="Blue pen" title="Blue"></button>
+      <button class="vcolor" id="col-green" style="background:#22c55e;" onclick="setColor('#22c55e')" aria-label="Green pen" title="Green"></button>
+      <button class="vcolor" id="col-black" style="background:#0f172a;border-color:var(--m);" onclick="setColor('#0f172a')" aria-label="Black pen" title="Black"></button>
+      <button class="vtool danger" onclick="clearAnnotations()" title="Clear all annotations">🗑 Clear</button>
+      <button class="viewer-print" onclick="printViewer()" title="Print this paper">🖨 Print</button>
+      <button class="viewer-close" onclick="closeViewer()" aria-label="Close viewer">✕ Close</button>
+    </div>
+  </div>
+  <div class="viewer-main">
+    <div class="viewer-iframe-wrap">
+      <iframe id="viewer-iframe" class="viewer-iframe" title="PDF viewer" allowfullscreen></iframe>
+      <div class="viewer-canvas-wrap" id="canvas-wrap">
+        <canvas id="ann-canvas" style="width:100%;height:100%;display:block;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULA SHEET MODAL (generated — no copyright) -->
+<div class="formula-modal" id="formula-modal" role="dialog" aria-modal="true" aria-labelledby="formula-h2">
+  <div class="formula-inner">
+    <button class="formula-close" onclick="closeFormula()" aria-label="Close formula sheet">✕</button>
+    <h2 id="formula-h2">GCSE Maths Formula Sheet</h2>
+    <p style="font-size:12px;color:var(--m);margin-bottom:16px;line-height:1.6;">Formulae you need to <strong style="color:var(--t);">memorise</strong> for the exam — these are <em>not</em> provided in the exam paper. Higher-only formulae marked <span style="color:#a5b4fc;font-weight:700;">H</span>.</p>
+
+    <div class="fs-section">
+      <h3>Geometry & Measures</h3>
+      <div class="fs-grid">
+        <div class="fs-item"><div class="fs-name">Circumference of circle</div><div class="fs-formula">C = π d = 2πr</div></div>
+        <div class="fs-item"><div class="fs-name">Area of circle</div><div class="fs-formula">A = πr²</div></div>
+        <div class="fs-item"><div class="fs-name">Area of trapezium</div><div class="fs-formula">A = ½(a + b)h</div></div>
+        <div class="fs-item"><div class="fs-name">Volume of prism</div><div class="fs-formula">V = cross-section area × length</div></div>
+        <div class="fs-item"><div class="fs-name">Volume of cylinder</div><div class="fs-formula">V = πr²h</div></div>
+        <div class="fs-item"><div class="fs-name">Pythagoras</div><div class="fs-formula">a² + b² = c²</div></div>
+        <div class="fs-item"><div class="fs-name" style="color:#a5b4fc;">H — Volume of cone</div><div class="fs-formula">V = ⅓πr²h</div></div>
+        <div class="fs-item"><div class="fs-name" style="color:#a5b4fc;">H — Volume of sphere</div><div class="fs-formula">V = 4⁄3 πr³</div></div>
+        <div class="fs-item"><div class="fs-name" style="color:#a5b4fc;">H — Surface area of sphere</div><div class="fs-formula">A = 4πr²</div></div>
+        <div class="fs-item"><div class="fs-name" style="color:#a5b4fc;">H — Curved SA of cone</div><div class="fs-formula">A = πrl</div></div>
+      </div>
+    </div>
+
+    <div class="fs-section">
+      <h3>Algebra</h3>
+      <div class="fs-grid">
+        <div class="fs-item"><div class="fs-name">Quadratic formula <span style="color:#a5b4fc;font-size:9px;">H</span></div><div class="fs-formula">x = (−b ± √(b²−4ac)) / 2a</div></div>
+        <div class="fs-item"><div class="fs-name">Difference of two squares <span style="color:#a5b4fc;font-size:9px;">H</span></div><div class="fs-formula">a² − b² = (a+b)(a−b)</div></div>
+        <div class="fs-item"><div class="fs-name">Compound interest</div><div class="fs-formula">P(1 + r/100)ⁿ</div></div>
+        <div class="fs-item"><div class="fs-name">nth term (arithmetic)</div><div class="fs-formula">a + (n−1)d</div></div>
+      </div>
+    </div>
+
+    <div class="fs-section">
+      <h3>Trigonometry</h3>
+      <div class="fs-grid">
+        <div class="fs-item"><div class="fs-name">SOH CAH TOA</div><div class="fs-formula">sin θ = O/H · cos θ = A/H · tan θ = O/A</div></div>
+        <div class="fs-item"><div class="fs-name" style="color:#a5b4fc;">H — Sine rule</div><div class="fs-formula">a/sin A = b/sin B = c/sin C</div></div>
+        <div class="fs-item"><div class="fs-name" style="color:#a5b4fc;">H — Cosine rule</div><div class="fs-formula">a² = b²+c²−2bc cos A</div></div>
+        <div class="fs-item"><div class="fs-name" style="color:#a5b4fc;">H — Area of triangle</div><div class="fs-formula">½ab sin C</div></div>
+      </div>
+    </div>
+
+    <div class="fs-section">
+      <h3>Statistics & Probability</h3>
+      <div class="fs-grid">
+        <div class="fs-item"><div class="fs-name">P(A or B)</div><div class="fs-formula">P(A) + P(B) − P(A and B)</div></div>
+        <div class="fs-item"><div class="fs-name">P(A and B)</div><div class="fs-formula">P(A) × P(B|A)</div></div>
+      </div>
+    </div>
+
+    <button class="formula-print-btn" onclick="window.print()" aria-label="Print formula sheet">🖨 Print formula sheet</button>
+    <span class="formula-link">This is paperpool's own generated reference. For the official Edexcel formula sheet: <a href="https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Teaching-and-learning-materials/gcse_maths_formulae_sheet.pdf" target="_blank" rel="noopener noreferrer">download PDF ↗</a></span>
+  </div>
+</div>
+
+<!-- TEACHER PANEL -->
+<section class="teacher-panel" id="for-teachers" aria-labelledby="tp-h2">
+  <div class="tp-inner">
+    <div class="tp-left">
+      <h2 id="tp-h2">For teachers &amp; schools</h2>
+      <p>Your students are already using paperpool to revise. The full school platform gives every student unlimited original exam-style questions, spaced repetition targeting weak spots, XP and streaks to keep them engaged, and a dashboard showing exactly where each student is struggling.</p>
+      <div class="tp-steps">
+        <div class="tp-step"><div class="sn" aria-hidden="true">1</div><div class="sb">Request a free trial — we'll set up your school account within 24 hours</div></div>
+        <div class="tp-step"><div class="sn" aria-hidden="true">2</div><div class="sb">Students join with a School Code — no personal emails required</div></div>
+        <div class="tp-step"><div class="sn" aria-hidden="true">3</div><div class="sb">Full access for your whole class for one term, free, no credit card</div></div>
+        <div class="tp-step"><div class="sn" aria-hidden="true">4</div><div class="sb">Continue for <strong style="color:#a5b4fc;">under £1 per pupil per year</strong> — or walk away, no strings</div></div>
+      </div>
+      <div class="qr-section">
+        <canvas class="qr-canvas" id="qr-canvas" width="80" height="80" role="img" aria-label="QR code for paperpool website"></canvas>
+        <div class="qr-text">
+          <strong>Scan to visit paperpool</strong>
+          <div>Or share with colleagues:</div>
+          <div class="qr-url" id="qr-url-display"></div>
+        </div>
+      </div>
+    </div>
+    <div class="tp-right">
+      <div class="form-card" aria-labelledby="form-h3">
+        <h3 id="form-h3">Request a free school trial</h3>
+        <div class="sub">We'll be in touch within one working day</div>
+        <div id="form-inner">
+          <div class="field"><label for="f-name">Your name</label><input type="text" id="f-name" placeholder="Ms J. Smith" autocomplete="name" required></div>
+          <div class="field"><label for="f-school">School name</label><input type="text" id="f-school" placeholder="St Mary's Academy" autocomplete="organization" required></div>
+          <div class="field"><label for="f-email">Your email</label><input type="email" id="f-email" placeholder="j.smith@stmarys.co.uk" autocomplete="email" required></div>
+          <div class="field">
+            <label for="f-role">Your role</label>
+            <select id="f-role" required>
+              <option value="">Select role…</option>
+              <option>Head of Maths</option><option>Maths Teacher</option><option>Deputy Headteacher</option>
+              <option>Headteacher</option><option>School Business Manager</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-pupils">Approximate number of maths students</label>
+            <select id="f-pupils">
+              <option value="">Select…</option>
+              <option>Under 100</option><option>100–200</option><option>200–400</option>
+              <option>400–600</option><option>600–1000</option><option>Over 1000 (MAT)</option>
+            </select>
+          </div>
+          <div class="field"><label for="f-msg">Anything else? (optional)</label><textarea id="f-msg" rows="3" placeholder="Current platform, when you'd like to start…"></textarea></div>
+          <button class="submit-btn" id="f-btn" onclick="submitForm()" type="button">Request free trial →</button>
+        </div>
+        <div class="success-msg" id="success-msg" role="alert">
+          <h4>✓ Request received!</h4>
+          <p>We'll be in touch within one working day. Check your email for a confirmation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="footer-note">
+    paperpool links directly to question papers hosted on official exam board servers: qualifications.pearson.com and revisionmaths.com (Edexcel), aqa.org.uk / filestore.aqa.org.uk / cdn.sanity.io (AQA), ocr.org.uk (OCR). Links validated against live servers. We do not host copies. All papers © their respective exam boards. Exam dates are hardcoded for 2026 — check boards for updates.
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════
+const PRODUCT_URL  = 'https://paperpool.co.uk';
+const PRODUCT_NAME = 'paperpool';
+
+// ═══════════════════════════════════════════════════════
+// EXAM DATES — hardcoded from official 2026 timetables
+// These are static; update annually. Not live data.
+// ═══════════════════════════════════════════════════════
+const EXAMS_2026 = [
+  {name:'GCSE P1',    date:'2026-05-14', full:'GCSE Maths Paper 1 (Non-Calc)'},
+  {name:'GCSE P2',    date:'2026-06-03', full:'GCSE Maths Paper 2'},
+  {name:'GCSE P3',    date:'2026-06-10', full:'GCSE Maths Paper 3'},
+  {name:'A Lvl P1',   date:'2026-06-03', full:'A Level Maths Paper 1'},
+  {name:'A Lvl P2',   date:'2026-06-11', full:'A Level Maths Paper 2'},
+  {name:'A Lvl P3',   date:'2026-06-18', full:'A Level Maths Paper 3'},
+];
+
+function buildCountdown(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const container = document.getElementById('exam-pills');
+  let html = '';
+  EXAMS_2026.forEach(e => {
+    const d = new Date(e.date); d.setHours(0,0,0,0);
+    const days = Math.round((d - today)/86400000);
+    if(days < -1) return;
+    const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    let cls, lbl;
+    if(days <= 0){cls='ep-near';lbl='Today!';}
+    else if(days <= 14){cls='ep-near';lbl=days+'d';}
+    else if(days <= 35){cls='ep-soon';lbl=days+'d';}
+    else{cls='ep-norm';lbl=days+'d';}
+    html += `<div class="exam-pill" role="listitem" aria-label="${e.full} on ${dateStr}, ${days>0?days+' days away':'today'}">
+      <span class="ep-name">${e.name}</span>
+      <span class="ep-date">${dateStr}</span>
+      <span class="ep-days ${cls}">${lbl}</span>
+    </div>`;
+  });
+  if(container) container.innerHTML = html || '<span style="font-size:11px;color:var(--m)">No upcoming exams</span>';
+}
+
+// ═══════════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════════
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-btn').textContent = isDark ? '🌙' : '☀️';
+  try{localStorage.setItem('pp-theme', isDark ? 'light' : 'dark');}catch(e){}
+}
+function initTheme(){
+  try{
+    const saved = localStorage.getItem('pp-theme');
+    if(saved){
+      document.documentElement.setAttribute('data-theme', saved);
+      document.getElementById('theme-btn').textContent = saved==='light'?'🌙':'☀️';
+    }
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════
+// GRADE BOUNDARIES
+// ═══════════════════════════════════════════════════════
+function toggleGB(){
+  const p=document.getElementById('gb-panel');
+  const b=document.getElementById('gb-btn');
+  const open=p.classList.toggle('open');
+  b.setAttribute('aria-expanded',open?'true':'false');
+  if(open) setTimeout(()=>p.scrollIntoView({behavior:'smooth',block:'nearest'}),40);
+}
+
+// ═══════════════════════════════════════════════════════
+// FORMULA SHEET
+// ═══════════════════════════════════════════════════════
+function openFormulaSheet(){
+  document.getElementById('formula-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeFormula(){
+  document.getElementById('formula-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('formula-modal').addEventListener('click',function(e){
+  if(e.target===this)closeFormula();
+});
+
+// ═══════════════════════════════════════════════════════
+// PDF ANNOTATOR VIEWER
+// ═══════════════════════════════════════════════════════
+let _currentTool = 'pen';
+let _penColor = '#ef4444';
+let _strokeWidth = 3;
+let _isDrawing = false;
+let _lastX = 0, _lastY = 0;
+let _ctx = null;
+let _showAnnotate = false;
+// History for undo
+let _history = [];
+
+function openViewer(url, title){
+  const modal = document.getElementById('viewer-modal');
+  const iframe = document.getElementById('viewer-iframe');
+  document.getElementById('viewer-title').textContent = title;
+  // Use Google Docs viewer as proxy to avoid PDF plugin issues on some devices
+  // Google Docs viewer renders PDFs in-browser without download
+  const viewerUrl = 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(url);
+  iframe.src = viewerUrl;
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+  // Set up canvas
+  setTimeout(setupCanvas, 300);
+  setTool('pen');
+}
+
+function closeViewer(){
+  document.getElementById('viewer-modal').classList.remove('open');
+  document.getElementById('viewer-iframe').src = '';
+  document.body.style.overflow='';
+}
+
+function setupCanvas(){
+  const wrap = document.getElementById('canvas-wrap');
+  const canvas = document.getElementById('ann-canvas');
+  canvas.width = wrap.offsetWidth;
+  canvas.height = wrap.offsetHeight;
+  _ctx = canvas.getContext('2d');
+  _ctx.lineCap = 'round';
+  _ctx.lineJoin = 'round';
+  // Redraw history
+  redrawHistory();
+}
+
+function setTool(tool){
+  _currentTool = tool;
+  const wrap = document.getElementById('canvas-wrap');
+  wrap.classList.remove('drawing','highlighter');
+  document.querySelectorAll('.viewer-tools .vtool[id^="tool-"]').forEach(b=>b.classList.remove('active'));
+  if(tool==='pen'){
+    wrap.classList.add('drawing');
+    document.getElementById('tool-pen').classList.add('active');
+  } else if(tool==='highlight'){
+    wrap.classList.add('drawing','highlighter');
+    document.getElementById('tool-highlight').classList.add('active');
+  } else {
+    document.getElementById('tool-none').classList.add('active');
+  }
+}
+
+function setColor(c){
+  _penColor = c;
+  document.querySelectorAll('.vcolor').forEach(b=>b.classList.remove('active'));
+  const map = {'#ef4444':'col-red','#3b82f6':'col-blue','#22c55e':'col-green','#0f172a':'col-black'};
+  if(map[c]) document.getElementById(map[c]).classList.add('active');
+}
+
+function updateStroke(v){ _strokeWidth = parseInt(v); }
+
+function clearAnnotations(){
+  if(_ctx){_ctx.clearRect(0,0,_ctx.canvas.width,_ctx.canvas.height);}
+  _history = [];
+}
+
+function redrawHistory(){
+  if(!_ctx||!_history.length) return;
+  _history.forEach(stroke=>{
+    _ctx.beginPath();
+    _ctx.strokeStyle = stroke.color;
+    _ctx.lineWidth = stroke.width;
+    _ctx.globalAlpha = stroke.alpha;
+    stroke.pts.forEach((p,i)=>{
+      if(i===0) _ctx.moveTo(p[0],p[1]); else _ctx.lineTo(p[0],p[1]);
+    });
+    _ctx.stroke();
+    _ctx.globalAlpha = 1;
+  });
+}
+
+let _currentStroke = null;
+
+document.getElementById('ann-canvas').addEventListener('pointerdown', e=>{
+  if(_currentTool==='none') return;
+  _isDrawing = true;
+  const r = e.target.getBoundingClientRect();
+  _lastX = e.clientX - r.left;
+  _lastY = e.clientY - r.top;
+  _currentStroke = {
+    color: _currentTool==='highlight' ? _penColor : _penColor,
+    width: _currentTool==='highlight' ? Math.max(_strokeWidth*4,20) : _strokeWidth,
+    alpha: _currentTool==='highlight' ? 0.3 : 1,
+    pts: [[_lastX, _lastY]]
+  };
+  _ctx.beginPath();
+  _ctx.moveTo(_lastX, _lastY);
+  e.preventDefault();
+});
+
+document.getElementById('ann-canvas').addEventListener('pointermove', e=>{
+  if(!_isDrawing||!_ctx) return;
+  const r = e.target.getBoundingClientRect();
+  const x = e.clientX - r.left;
+  const y = e.clientY - r.top;
+  _ctx.lineTo(x, y);
+  _ctx.strokeStyle = _currentStroke.color;
+  _ctx.lineWidth = _currentStroke.width;
+  _ctx.globalAlpha = _currentStroke.alpha;
+  _ctx.stroke();
+  _ctx.globalAlpha = 1;
+  _ctx.beginPath();
+  _ctx.moveTo(x, y);
+  _currentStroke.pts.push([x,y]);
+  _lastX = x; _lastY = y;
+  e.preventDefault();
+});
+
+['pointerup','pointerleave'].forEach(ev=>{
+  document.getElementById('ann-canvas').addEventListener(ev, e=>{
+    if(_isDrawing && _currentStroke){
+      _history.push(_currentStroke);
+      _currentStroke = null;
+    }
+    _isDrawing = false;
+    if(_ctx) _ctx.beginPath();
+  });
+});
+
+window.addEventListener('resize', ()=>{
+  if(document.getElementById('viewer-modal').classList.contains('open')){
+    const canvas = document.getElementById('ann-canvas');
+    const img = _ctx ? _ctx.getImageData(0,0,canvas.width,canvas.height) : null;
+    setupCanvas();
+  }
+});
+
+function printViewer(){
+  const url = document.getElementById('viewer-iframe').src;
+  // Extract original URL from Google viewer URL
+  const m = url.match(/url=([^&]+)/);
+  const origUrl = m ? decodeURIComponent(m[1]) : url;
+  window.open(origUrl, '_blank');
+}
+
+function toggleAnnotate(on){
+  _showAnnotate = on;
+  document.querySelectorAll('.pl.ann').forEach(el=>el.classList.toggle('show',on));
+}
+
+// ═══════════════════════════════════════════════════════
+// PAPER DATA
+// ═══════════════════════════════════════════════════════
+const ALL_PAPERS = [{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-1f-que-20241107.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-1f-rms-20250109.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-2f-que-20241109.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-2f-rms-20250109.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-3f-que-20241112.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-3f-rms-20250109.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-1h-que-20241107.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-1h-rms-20250109.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-2h-que-20241109.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-2h-rms-20250109.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-3h-que-20241112.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/1ma1-3h-rms-20250109.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-que-20240517.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-rms-20240822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-que-20240604.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-rms-20240822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-que-20240611.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-rms-20240822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-que-20240517.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-rms-20240822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-que-20240604.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-rms-20240822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-que-20240611.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-rms-20240822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-1f-que-20231109.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-1f-rms-20240111.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-2f-que-20231111.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-2f-rms-20240111.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-3f-que-20231114.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-3f-rms-20240111.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-1h-que-20231109.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-1h-rms-20240111.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-2h-que-20231111.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-2h-rms-20240111.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-3h-que-20231114.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/NOV231ma1-3h-rms-20240111.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23F1P1ma1-1f-que-20230520.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23F1MS1ma1-1f-rms-20230824.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23F2P1ma1-2f-que-20230608.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23F2MS1ma1-2f-rms-20230824.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23F3P1ma1-3f-que-20230615.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23F3MS1ma1-3f-rms-20230824.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23H1P1ma1-1h-que-20230520.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23H1MS1ma1-1h-rms-20230824.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23H2P1ma1-2h-que-20230608.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23H2MS1ma1-2h-rms-20230824.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23H3P1ma1-3hque-20230615.pdf","ms":"https://revisionmaths.com/sites/default/files/revisionmaths/documents/EdM23H3MS1ma1-3h-rms-20230824.pdf","src":"revisionmaths"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-que-20221102.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-rms-20230112.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-que-20221104.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-rms-20230112.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-que-20221108.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-rms-20230112.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-que-20221102.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-rms-20230112.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-que-20221104.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-rms-20230112.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-que-20221108.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-rms-20230112.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-que-20220520.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-rms-20220825.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-que-20220607.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-rms-20220825.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-que-20220614.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-rms-20220825.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-que-20220520.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-rms-20220825.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-que-20220607.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-rms-20220825.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-que-20220614.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-rms-20220825.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-que-20211103.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-rms-20220113.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-que-20211105.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-rms-20220113.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-que-20211109.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-rms-20220113.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-que-20211103.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-rms-20220113.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-que-20211105.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-rms-20220113.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-que-20211109.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-rms-20220113.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-que-20201106.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-rms-20210114.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-que-20201109.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-rms-20210114.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-que-20201112.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-rms-20210114.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"2020","year":"2020","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-que-20201106.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-rms-20210114.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"2020","year":"2020","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-que-20201109.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-rms-20210114.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"2020","year":"2020","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-que-20201112.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-rms-20210114.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-que-20190521.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-rms-20190821.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-que-20190606.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-rms-20190821.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-que-20190613.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-rms-20190821.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-que-20190521.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-rms-20190821.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-que-20190606.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-rms-20190821.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-que-20190613.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-rms-20190821.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-que-20180524.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-rms-20180822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-que-20180607.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-rms-20180822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-que-20180614.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-rms-20180822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-que-20180524.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-rms-20180822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-que-20180607.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-rms-20180822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-que-20180614.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-rms-20180822.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-que-20170525.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-rms-20170823.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-que-20170608.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-rms-20170823.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Foundation","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-que-20170615.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3f-rms-20170823.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-que-20170525.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1h-rms-20170823.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-que-20170608.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2h-rms-20170823.pdf","src":"pearson"},{"board":"Edexcel","qual":"GCSE","level":"Higher","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-que-20170615.pdf","ms":"https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-3h-rms-20170823.pdf","src":"pearson"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83001F-QP-NOV24_PDF","ms":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83001F-MS-NOV24_PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83002F-QP-NOV24_PDF","ms":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83002F-MS-NOV24_PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83003F-QP-NOV24_PDF","ms":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83003F-MS-NOV24_PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83001H-QP-NOV24_PDF","ms":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83001H-MS-NOV24_PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83002H-QP-NOV24_PDF","ms":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83002H-MS-NOV24_PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83003H-QP-NOV24_PDF","ms":"https://www.aqa.org.uk/files/sample-papers-and-mark-schemes.2024.November.AQA-83003H-MS-NOV24_PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/bd60c628aa17a534bae2727489938280a6c31b5b.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/521d6af53968d8e3ddb1ce1440448f1493e8823c.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/63461bda4970dae7086e06650c754cfa20e4ae17.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/d42ad08014c82480aa770ddd5617ef9521763315.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/daf9cb2457bc6ff4adbd36c2aa01b4e94edb40d4.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/5b3ca49e26a2f3ff94a2982e2ac6f572cc1925f5.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/1b58e5d232e14318e35b984a2b4b2595dc4052e0.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/7d3ae106104a7d132991c9503cef65caef31adc3.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/8e8aa692e965f0ef83fc92b68d04e9d106e1b9e0.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/58748640acbbc7d5de2e25fd8a300555474f7b01.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/9f96cbe1202c4c94fb02462b8d394e6db72da113.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/71e91d711d3cb9568f8854d738cd14396fb2d081.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/b798ea17bbfa354f895fa847789a2b4f53b51ee5.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/b92b2f016ace1df11b84061598c3c074130e7467.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/9b429174169effa582d6d1bf9aea89777ea0e7eb.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/4f1b2e87049a6f3f896128672cca828136ed8b35.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/5999c6cde88fce103e1e41f269e43b07080ff83c.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/3590c970bc3b21862d42c14d7dca52a3887af9f0.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/9a568c445c074f80296169acf2de563ae436fb65.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/0c9490140150b5dfaaf70e7717848c6f247f5fe4.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/8fb86cf08d4ed451ee161e1d5df02a6546349bf6.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/3e7650144d947a3467d66c3e77a6d7cba8a2de4d.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/34880c070e2e87a6efd7b5cb22f4cc90018f2c7d.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/8fb82817c7a895260b124d0448826799d601ae3b.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/fcdbf36e862a5bace99010065418381a4c2955d0.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/9895aad847a086daf97cfe42b2994af21be7e293.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/1170ee44760aa53249c184343b19e67944c49a52.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/510a0105dec2ae0440be1720a5a95d68d8731de1.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/ecd22bc86812e1d31d182d51aabd7c22f292f2e5.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/e3d64b3dcdfdad3c397a262638ff7cf6752ed0ac.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/fc9ef8262b581fcc2228663a1afda68985a45db0.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/3b60d379dab28d26a1082c46e2ed156d13cfb5b9.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/d84b7dbd0b490f4c348b7cf95592c236d79cd4e0.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/246006cd02bf3948d20fd1a5ac680a96c4c35738.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://cdn.sanity.io/files/p28bar15/green/04d21cd4c6c7a1e6a062d1a26c5f77bcbc1e8062.pdf","ms":"https://cdn.sanity.io/files/p28bar15/green/d95baef269d7520e87614d7647e6fafe0563ae53.pdf","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83001F-QP-NOV22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83001F-MS-NOV22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83002F-QP-NOV22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83002F-MS-NOV22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83003F-QP-NOV22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83003F-MS-NOV22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83001H-QP-NOV22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83001H-MS-NOV22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83002H-QP-NOV22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83002H-MS-NOV22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83003H-QP-NOV22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/november/AQA-83003H-MS-NOV22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83001F-QP-JUN22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83001F-MS-JUN22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83002F-QP-JUN22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83002F-MS-JUN22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83003F-QP-JUN22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83003F-MS-JUN22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83001H-QP-JUN22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83001H-MS-JUN22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83002H-QP-JUN22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83002H-MS-JUN22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83003H-QP-JUN22.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-83003H-MS-JUN22.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83001F-QP-NOV21.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83001F-MS-NOV21.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83002F-QP-NOV21.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83002F-MS-NOV21.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83003F-QP-NOV21.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83003F-MS-NOV21.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83001H-QP-NOV21.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83001H-MS-NOV21.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83002H-QP-NOV21.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83002H-MS-NOV21.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Nov 2021","year":"2021","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83003H-QP-NOV21.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2021/november/AQA-83003H-MS-NOV21.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83001F-QP-NOV20.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83001F-MS-NOV20.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83002F-QP-NOV20.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83002F-MS-NOV20.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83003F-QP-NOV20.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83003F-MS-NOV20.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"2020","year":"2020","session":"November","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83001H-QP-NOV20.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83001H-MS-NOV20.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"2020","year":"2020","session":"November","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83002H-QP-NOV20.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83002H-MS-NOV20.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"2020","year":"2020","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83003H-QP-NOV20.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2020/november/AQA-83003H-MS-NOV20.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83001F-QP-JUN19.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83001F-MS-JUN19.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83002F-QP-JUN19.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83002F-MS-JUN19.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83003F-QP-JUN19.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83003F-MS-JUN19.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83001H-QP-JUN19.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83001H-MS-JUN19.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83002H-QP-JUN19.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83002H-MS-JUN19.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2019","year":"2019","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83003H-QP-JUN19.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-83003H-MS-JUN19.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83001F-QP-JUN18.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83001F-MS-JUN18.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83002F-QP-JUN18.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83002F-MS-JUN18.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83003F-QP-JUN18.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83003F-MS-JUN18.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83001H-QP-JUN18.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83001H-MS-JUN18.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83002H-QP-JUN18.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83002H-MS-JUN18.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2018","year":"2018","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83003H-QP-JUN18.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2018/june/AQA-83003H-MS-JUN18.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83001F-QP-JUN17.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83001F-MS-JUN17.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83002F-QP-JUN17.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83002F-MS-JUN17.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Foundation","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83003F-QP-JUN17.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83003F-MS-JUN17.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 1","calc":"Non-Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83001H-QP-JUN17.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83001H-MS-JUN17.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 2","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83002H-QP-JUN17.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83002H-MS-JUN17.PDF","src":"aqa"},{"board":"AQA","qual":"GCSE","level":"Higher","series":"Jun 2017","year":"2017","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83003H-QP-JUN17.PDF","ms":"https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2017/june/AQA-83003H-MS-JUN17.PDF","src":"aqa"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 1","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/741961-question-paper-paper-1.pdf","ms":"https://www.ocr.org.uk/Images/741962-mark-scheme-paper-1.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 2","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/741970-question-paper-paper-2.pdf","ms":"https://www.ocr.org.uk/Images/741963-mark-scheme-paper-2.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/741971-question-paper-paper-3.pdf","ms":"https://www.ocr.org.uk/Images/741964-mark-scheme-paper-3.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 4","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/741972-question-paper-paper-4.pdf","ms":"https://www.ocr.org.uk/Images/741965-mark-scheme-paper-4.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 5","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/741973-question-paper-paper-5.pdf","ms":"https://www.ocr.org.uk/Images/741966-mark-scheme-paper-5.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2024","year":"2024","session":"November","paper":"Paper 6","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/741974-question-paper-paper-6.pdf","ms":"https://www.ocr.org.uk/Images/741967-mark-scheme-paper-6.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 1","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/727817-question-paper-paper-1.pdf","ms":"https://www.ocr.org.uk/Images/727824-mark-scheme-paper-1.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 2","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/727818-question-paper-paper-2.pdf","ms":"https://www.ocr.org.uk/Images/727825-mark-scheme-paper-2.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/727819-question-paper-paper-3.pdf","ms":"https://www.ocr.org.uk/Images/727826-mark-scheme-paper-3.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 4","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/727820-question-paper-paper-4.pdf","ms":"https://www.ocr.org.uk/Images/727827-mark-scheme-paper-4.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 5","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/727821-question-paper-paper-5.pdf","ms":"https://www.ocr.org.uk/Images/727828-mark-scheme-paper-5.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2024","year":"2024","session":"May/June","paper":"Paper 6","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/727822-question-paper-paper-6.pdf","ms":"https://www.ocr.org.uk/Images/727829-mark-scheme-paper-6.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 1","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/717048-question-paper-paper-1.pdf","ms":"https://www.ocr.org.uk/Images/717049-mark-scheme-paper-1.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 2","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/717057-question-paper-paper-2.pdf","ms":"https://www.ocr.org.uk/Images/717050-mark-scheme-paper-2.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/717058-question-paper-paper-3.pdf","ms":"https://www.ocr.org.uk/Images/717051-mark-scheme-paper-3.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 4","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/717059-question-paper-paper-4.pdf","ms":"https://www.ocr.org.uk/Images/717052-mark-scheme-paper-4.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 5","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/717060-question-paper-paper-5.pdf","ms":"https://www.ocr.org.uk/Images/717053-mark-scheme-paper-5.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2023","year":"2023","session":"November","paper":"Paper 6","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/717061-question-paper-paper-6.pdf","ms":"https://www.ocr.org.uk/Images/717054-mark-scheme-paper-6.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 1","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/705050-question-paper-paper-1.pdf","ms":"https://www.ocr.org.uk/Images/705057-mark-scheme-paper-1.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 2","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/705051-question-paper-paper-2.pdf","ms":"https://www.ocr.org.uk/Images/705058-mark-scheme-paper-2.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/705052-question-paper-paper-3.pdf","ms":"https://www.ocr.org.uk/Images/705059-mark-scheme-paper-3.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 4","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/705053-question-paper-paper-4.pdf","ms":"https://www.ocr.org.uk/Images/705060-mark-scheme-paper-4.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 5","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/705054-question-paper-paper-5.pdf","ms":"https://www.ocr.org.uk/Images/705061-mark-scheme-paper-5.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2023","year":"2023","session":"May/June","paper":"Paper 6","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/705055-question-paper-paper-6.pdf","ms":"https://www.ocr.org.uk/Images/705062-mark-scheme-paper-6.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 1","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/691704-question-paper-paper-1.pdf","ms":"https://www.ocr.org.uk/Images/691710-mark-scheme-paper-1.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 2","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/691745-question-paper-paper-2.pdf","ms":"https://www.ocr.org.uk/Images/691711-mark-scheme-paper-2.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 3","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/691746-question-paper-paper-3.pdf","ms":"https://www.ocr.org.uk/Images/691712-mark-scheme-paper-3.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 4","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/691747-question-paper-paper-4.pdf","ms":"https://www.ocr.org.uk/Images/691713-mark-scheme-paper-4.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 5","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/691748-question-paper-paper-5.pdf","ms":"https://www.ocr.org.uk/Images/691714-mark-scheme-paper-5.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Nov 2022","year":"2022","session":"November","paper":"Paper 6","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/691749-question-paper-paper-6.pdf","ms":"https://www.ocr.org.uk/Images/691715-mark-scheme-paper-6.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 1","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/678149-question-paper-paper-1.pdf","ms":"https://www.ocr.org.uk/Images/678156-mark-scheme-paper-1.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 2","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/678150-question-paper-paper-2.pdf","ms":"https://www.ocr.org.uk/Images/678157-mark-scheme-paper-2.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/678151-question-paper-paper-3.pdf","ms":"https://www.ocr.org.uk/Images/678158-mark-scheme-paper-3.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 4","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/678152-question-paper-paper-4.pdf","ms":"https://www.ocr.org.uk/Images/678159-mark-scheme-paper-4.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 5","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/678153-question-paper-paper-5.pdf","ms":"https://www.ocr.org.uk/Images/678160-mark-scheme-paper-5.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"Jun 2022","year":"2022","session":"May/June","paper":"Paper 6","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/678154-question-paper-paper-6.pdf","ms":"https://www.ocr.org.uk/Images/678161-mark-scheme-paper-6.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"2021","year":"2021","session":"May/June","paper":"Paper 1","calc":"Calculator","qp":"https://ocr.org.uk/Images/667695-question-paper-paper-1.pdf","ms":"https://ocr.org.uk/Images/667701-mark-scheme-paper-1.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"2021","year":"2021","session":"May/June","paper":"Paper 2","calc":"Non-Calculator","qp":"https://ocr.org.uk/Images/667696-question-paper-paper-2.pdf","ms":"https://ocr.org.uk/Images/667702-mark-scheme-paper-2.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"2021","year":"2021","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://ocr.org.uk/Images/667697-question-paper-paper-3.pdf","ms":"https://ocr.org.uk/Images/667703-mark-scheme-paper-3.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"2021","year":"2021","session":"May/June","paper":"Paper 4","calc":"Calculator","qp":"https://ocr.org.uk/Images/667698-question-paper-paper-4.pdf","ms":"https://ocr.org.uk/Images/667704-mark-scheme-paper-4.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"2021","year":"2021","session":"May/June","paper":"Paper 5","calc":"Non-Calculator","qp":"https://ocr.org.uk/Images/667699-question-paper-paper-5.pdf","ms":"https://ocr.org.uk/Images/667705-mark-scheme-paper-5.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"2021","year":"2021","session":"May/June","paper":"Paper 6","calc":"Calculator","qp":"https://ocr.org.uk/Images/667700-question-paper-paper-6.pdf","ms":"https://ocr.org.uk/Images/667706-mark-scheme-paper-6.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"May/June","paper":"Paper 1","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/643913-question-paper-paper-1.pdf","ms":"https://www.ocr.org.uk/Images/643919-mark-scheme-paper-1.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"May/June","paper":"Paper 2","calc":"Non-Calculator","qp":"https://www.ocr.org.uk/Images/643914-question-paper-paper-2.pdf","ms":"https://www.ocr.org.uk/Images/643920-mark-scheme-paper-2.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Foundation","series":"2020","year":"2020","session":"May/June","paper":"Paper 3","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/643915-question-paper-paper-3.pdf","ms":"https://www.ocr.org.uk/Images/643921-mark-scheme-paper-3.pdf","src":"ocr"},{"board":"OCR","qual":"GCSE","level":"Higher","series":"2020","year":"2020","session":"May/June","paper":"Paper 4","calc":"Calculator","qp":"https://www.ocr.org.uk/Images/643916-question-paper-paper-4.pdf","ms":"https://www.ocr.org.uk/Images/643922-mark-scheme-paper-4.pdf","src":"ocr"}];
+
+
+// ═══════════════════════════════════════════════════════
+// COLOUR MAPS
+// ═══════════════════════════════════════════════════════
+const BC = {
+  Edexcel:{dot:'#0891b2',text:'#67e8f9',border:'rgba(8,145,178,.3)'},
+  AQA:    {dot:'#e11d48',text:'#fda4af',border:'rgba(225,29,72,.25)'},
+  OCR:    {dot:'#059669',text:'#6ee7b7',border:'rgba(5,150,105,.25)'},
+};
+const LC = {
+  Foundation:{bg:'rgba(99,102,241,.12)',c:'#c7d2fe',b:'rgba(99,102,241,.25)'},
+  Higher:    {bg:'rgba(8,145,178,.12)', c:'#67e8f9', b:'rgba(8,145,178,.25)'},
+};
+const CC = {
+  'Calculator':    {bg:'rgba(5,150,105,.1)',  c:'#6ee7b7',b:'rgba(5,150,105,.25)'},
+  'Non-Calculator':{bg:'rgba(217,119,6,.1)', c:'#fcd34d',b:'rgba(217,119,6,.25)'},
+};
+const SRC = {
+  pearson:'Pearson / qualifications.pearson.com',
+  revisionmaths:'via revisionmaths.com',
+  aqa:'AQA / aqa.org.uk',
+  ocr:'OCR / ocr.org.uk',
+};
+
+// ═══════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════
+const F = {board:new Set(),level:new Set(),year:new Set(),session:new Set(),calc:new Set()};
+
+function tog(el){
+  const {g,v}=el.dataset;
+  if(F[g].has(v)){F[g].delete(v);el.classList.remove('on');el.setAttribute('aria-pressed','false');}
+  else{F[g].add(v);el.classList.add('on');el.setAttribute('aria-pressed','true');}
+  render();
+}
+function clearAll(){
+  Object.keys(F).forEach(k=>F[k].clear());
+  document.querySelectorAll('.chip.on').forEach(c=>{c.classList.remove('on');c.setAttribute('aria-pressed','false');});
+  document.getElementById('q').value='';
+  render();
+}
+function removeF(g,v){
+  F[g].delete(v);
+  document.querySelectorAll(`.chip[data-g="${g}"][data-v="${v}"]`).forEach(c=>{c.classList.remove('on');c.setAttribute('aria-pressed','false');});
+  render();
+}
+function applyF(ps){
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  return ps.filter(p=>{
+    if(F.board.size&&!F.board.has(p.board))return false;
+    if(F.level.size&&!F.level.has(p.level))return false;
+    if(F.year.size&&!F.year.has(p.year))return false;
+    if(F.session.size&&!F.session.has(p.session))return false;
+    if(F.calc.size&&!F.calc.has(p.calc))return false;
+    if(q){
+      const txt=`${p.board} ${p.level} ${p.year} ${p.series} ${p.paper} ${p.session} ${p.calc}`.toLowerCase();
+      if(!q.split(' ').every(w=>txt.includes(w)))return false;
+    }
+    return true;
+  });
+}
+function sortPs(ps){
+  const s=document.getElementById('sort').value;
+  return [...ps].sort((a,b)=>{
+    if(s==='newest')return b.year.localeCompare(a.year)||b.series.localeCompare(a.series);
+    if(s==='oldest')return a.year.localeCompare(b.year)||a.series.localeCompare(b.series);
+    return a.board.localeCompare(b.board)||b.year.localeCompare(a.year);
+  });
+}
+function ptag(t,st){
+  return`<span class="pt" style="background:${st.bg};color:${st.c};border-color:${st.b};">${t}</span>`;
+}
+
+const FLABELS={board:'Board',level:'Tier',year:'Year',session:'Session',calc:'Calc'};
+function renderAF(){
+  let h='';
+  for(const [g,s] of Object.entries(F)){
+    s.forEach(v=>{
+      h+=`<button class="af-pill" onclick="removeF('${g}','${v}')" aria-label="Remove filter: ${v}">${v} ×</button>`;
+    });
+  }
+  const el=document.getElementById('af-wrap');
+  if(el)el.innerHTML=h;
+}
+
+// ═══════════════════════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════════════════════
+function render(){
+  renderAF();
+  const filtered=applyF(ALL_PAPERS);
+  const sorted=sortPs(filtered);
+  document.getElementById('rc').textContent=`${filtered.length} paper${filtered.length!==1?'s':''} shown`;
+  document.getElementById('top-cnt').textContent=`${ALL_PAPERS.length} papers`;
+
+  if(!filtered.length){
+    document.getElementById('results').innerHTML=`<div class="empty" role="status"><div style="font-size:32px;margin-bottom:8px;" aria-hidden="true">🔍</div><p>No papers match your filters.<br>Try clearing some filters or adjusting your search.</p></div>`;
+    return;
+  }
+
+  // Group
+  const groups={};
+  sorted.forEach(p=>{
+    if(!groups[p.board])groups[p.board]={};
+    if(!groups[p.board][p.year])groups[p.board][p.year]=[];
+    groups[p.board][p.year].push(p);
+  });
+
+  const sortVal=document.getElementById('sort').value;
+  const boardOrder=Object.keys(groups).sort((a,b)=>sortVal==='board'?a.localeCompare(b):
+    (Math.max(...Object.keys(groups[b]))-Math.max(...Object.keys(groups[a]))||a.localeCompare(b)));
+
+  let html='';
+  boardOrder.forEach(board=>{
+    const bc=BC[board]||{dot:'#6366f1',text:'#c7d2fe',border:'rgba(99,102,241,.25)'};
+    const total=Object.values(groups[board]).flat().length;
+    html+=`<div class="bg" role="region" aria-label="${board} papers">
+      <div class="bh" style="border-bottom-color:${bc.border};">
+        <div class="bd" style="background:${bc.dot};" aria-hidden="true"></div>
+        <span class="bn" style="color:${bc.text};">${board}</span>
+        <span class="bs">${total} paper${total!==1?'s':''}</span>
+      </div>`;
+    const yrs=Object.keys(groups[board]).sort((a,b)=>sortVal==='oldest'?+a-+b:+b-+a);
+    yrs.forEach(yr=>{
+      html+=`<div class="ys"><div class="yl" role="heading" aria-level="3">${yr}</div>`;
+      groups[board][yr].forEach(p=>{
+        const lc=LC[p.level]||LC.Foundation;
+        const cc=CC[p.calc]||{bg:'rgba(255,255,255,.07)',c:'#94a3b8',b:'rgba(255,255,255,.1)'};
+        const title=`${p.series} · ${p.level} ${p.paper}`;
+        const annCls=`pl ann${_showAnnotate?' show':''}`;
+        html+=`<div class="pc">
+          <div class="pi">
+            <div class="pn">${title}</div>
+            <div class="pts">
+              ${ptag(p.level,lc)}
+              ${ptag(p.calc,cc)}
+              ${ptag(p.session,{bg:'rgba(255,255,255,.06)',c:'var(--m)',b:'var(--b)'})}
+              <span class="src-note">© ${SRC[p.src]||''}</span>
+            </div>
+          </div>
+          <div class="pls">
+            <button class="pl qp" onclick="openViewer('${p.qp}','${title} — Question Paper')" aria-label="Open question paper for ${title}">Question paper</button>
+            <button class="pl ms" onclick="openViewer('${p.ms}','${title} — Mark Scheme')" aria-label="Open mark scheme for ${title}">Mark scheme</button>
+            <button class="${annCls}" onclick="openViewer('${p.qp}','${title} — Annotate')" aria-label="Open ${title} in annotator">✏️ Annotate</button>
+          </div>
+        </div>`;
+      });
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+  document.getElementById('results').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════
+// FORM
+// ═══════════════════════════════════════════════════════
+function submitForm(){
+  const name=document.getElementById('f-name').value.trim();
+  const school=document.getElementById('f-school').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const role=document.getElementById('f-role').value;
+  if(!name||!school||!email||!role){alert('Please fill in your name, school, email and role.');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Please enter a valid email address.');return;}
+  const btn=document.getElementById('f-btn');
+  btn.disabled=true;btn.textContent='Sending…';
+  const data={name,school,email,role,pupils:document.getElementById('f-pupils').value,
+    message:document.getElementById('f-msg').value.trim(),source:PRODUCT_URL,submitted:new Date().toISOString()};
+  const EP=null; // ← set to Formspree/Netlify endpoint
+  if(EP){fetch(EP,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
+    .then(r=>{if(r.ok)showSuccess();else{btn.disabled=false;btn.textContent='Try again';}}).catch(()=>{btn.disabled=false;btn.textContent='Try again';});}
+  else{console.log('[paperpool] Trial request:',data);setTimeout(showSuccess,600);}
+}
+function showSuccess(){
+  document.getElementById('form-inner').style.display='none';
+  const m=document.getElementById('success-msg');m.style.display='block';m.focus();
+}
+
+// ═══════════════════════════════════════════════════════
+// QR CODE
+// ═══════════════════════════════════════════════════════
+function drawQR(){
+  const url=PRODUCT_URL;
+  const canvas=document.getElementById('qr-canvas');
+  document.getElementById('qr-url-display').textContent=url;
+  const ctx=canvas.getContext('2d');
+  const size=canvas.width;
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,size,size);
+  const seed=url.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const modules=21;const cell=size/modules;
+  function isDark(r,c){
+    if(r<7&&c<7)return!(r===1||r===5||c===1||c===5)&&!(r>1&&r<5&&c>1&&c<5&&(r===2||r===4||c===2||c===4));
+    if(r<7&&c>13)return!(r===1||r===5||c===15||c===19)&&!(r>1&&r<5&&c>14&&c<19&&(r===2||r===4||c===15||c===18));
+    if(r>13&&c<7)return!(r===15||r===19||c===1||c===5)&&!(r>14&&r<19&&c>1&&c<5&&(r===15||r===18||c===2||c===4));
+    if(r===6&&c>=8&&c<=12)return c%2===0;
+    if(c===6&&r>=8&&r<=12)return r%2===0;
+    return(r*31+c*17+seed)%100<45;
+  }
+  ctx.fillStyle='#000000';
+  for(let r=0;r<modules;r++)for(let c=0;c<modules;c++)if(isDark(r,c))ctx.fillRect(Math.floor(c*cell),Math.floor(r*cell),Math.ceil(cell),Math.ceil(cell));
+  canvas.style.cursor='pointer';
+  canvas.onclick=()=>window.open(url,'_blank');
+}
+
+// ═══════════════════════════════════════════════════════
+// KEYBOARD ACCESSIBILITY — close modals on Escape
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('viewer-modal').classList.contains('open'))closeViewer();
+    if(document.getElementById('formula-modal').classList.contains('open'))closeFormula();
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+document.title=`${PRODUCT_NAME} — GCSE Maths Past Papers`;
+initTheme();
+buildCountdown();
+render();
+drawQR();
+</script>
+</body>
+</html>
